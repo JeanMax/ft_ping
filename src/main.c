@@ -6,36 +6,36 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/19 17:34:05 by mcanal           ###   ########.fr       */
+/*   Updated: 2015/11/20 16:29:12 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
+
+static t_bool			parse_flags(char *s, t_char *flags)
+{
+	if (!*s)
+		return (TRUE);
+	else if (*s == 'v')
+		*flags |= FLAG_V;
+	else if (*s == 'h')
+		*flags |= FLAG_H;
+	else
+		return (FALSE);	
+
+	return (parse_flags(s + 1, flags));
+}
+
 static char				*parse_av(char **av, t_char *flags)
 {
-	if (!(*++av) || **av != '-')
+	if (!(*av) || **av != '-')
 		return (*av && *(av + 1) ? NULL : *av);
-	if (*(*av + 1) && !*(*av + 2))
-	{
-		if (*(*av + 1) == 'v')
-			*flags |= FLAG_V;
-		else if (*(*av + 1) == 'h')
-			*flags |= FLAG_H;
-		else
-			return (NULL);
-	}
-	else if (*(*av + 1) && *(*av + 2) && !*(*av + 3))
-	{
-		if ((*(*av + 1) == 'v' && *(*av + 2) == 'h') ||	\
-			(*(*av + 1) == 'h' && *(*av + 2) == 'v'))
-			*flags |= (FLAG_V | FLAG_H);
-		else
-			return (NULL);
-	}
-	else
+
+	if (!(parse_flags(*av + 1, flags)))
 		return (NULL);
-	return (parse_av(av, flags));
+
+	return (parse_av(av + 1, flags));
 }
 
 int						main(int ac, char **av)
@@ -47,7 +47,7 @@ int						main(int ac, char **av)
 
 	flags = 0;
 	host = NULL;
-	if (ac < 2 || ac > 4 || !(host = parse_av(av, &flags)))
+	if (ac < 2 || ac > 4 || !(host = parse_av(av + 1, &flags)))
 		error(USAGE, *av);
 
 	if ((inet_pton(AF_INET, host, &(sa.sin_addr))) <= 0) //AF_INET6 -> IPV6
