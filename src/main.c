@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/23 14:32:19 by mcanal           ###   ########.fr       */
+/*   Updated: 2015/11/23 16:33:00 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,27 +68,61 @@ static int				get_sock(char *host)
 	return (sock);
 }
 
-static void debugsock(int sock, struct sockaddr *to)
+ //debug
+static void debugmsg(struct msghdr *msg)
+{
+	ft_putendl("-----------------------------------");
+	ft_debugnbr("namelen", msg->msg_namelen);
+	ft_putstr("<name:");
+	write(1, msg->msg_name, msg->msg_namelen);
+	ft_putendl(">");
+	
+	ft_debugnbr("iolen", msg->msg_iovlen);
+//	if (msg->msg_iovlen > 0)
+//	{
+		ft_putstr("<iobase:");
+//		write(1, msg->msg_iov->iov_base, msg->msg_iov->iov_len);
+		write(1, msg->msg_iov->iov_base, 4);
+		ft_putendl(">");
+//	}
+
+	ft_debugnbr("controllen", msg->msg_controllen);
+	ft_debugnbr("flags", msg->msg_flags);
+	ft_putendl("-----------------------------------");
+}
+ //debug
+
+static void debugsock(int sock, struct sockaddr_in *to)
 {
 	struct msghdr msg;
 	struct iovec iov;
 
-//	ft_bzero((void *)&msg, sizeof(struct msghdr));
-	ft_bzero((void *)&iov, sizeof(struct iovec));
-	msg.msg_iov = &iov;
-	msg.msg_iovlen = 1;
+	ft_bzero((void *)&msg, sizeof(msg));
+	ft_bzero((void *)&iov, sizeof(iov));
 
 	if (fork())
 	{
-		recvmsg(sock, &msg, 0);
-		ft_debugstr("msg", msg.msg_iov->iov_base);
+		if (recvmsg(sock, &msg, 0) < 0)
+			perror("recvmsg() failed");
+		ft_putendl("recv:"); //debug
+		debugmsg(&msg); //debug
 	}
 	else
 	{
-		sleep(1);
+//		sleep(1);
+		msg.msg_name = to->sin_addr;
+		msg.msg_namelen = to->sin_addrlen;
+		msg.msg_iov = &iov;
+		msg.msg_iovlen = 1;
 		iov.iov_base = ft_strdup("toto");
+//		ft_memcpy(iov.iov_base, "toto", 4);
+
+		
 		iov.iov_len = 5;
-		sendmsg(sock, &msg, 0);
+		ft_putendl("\nsend:"); //debug
+		debugmsg(&msg); //debug
+		if (sendmsg(sock, &msg, 0) < 0)
+			perror("sendmsg() failed");
 //		sendto(sock, &msg, sizeof(msg), 0, to, sizeof(to));
 		exit(0);
 	}
@@ -138,7 +172,7 @@ int						main(int ac, char **av)
 
 	
 	 //debug
-	debugsock(sock, (struct sockaddr *) to);
+	debugsock(sock, to);
 	ft_debugstr("host", host);
 	ft_debugnbr("sock", sock);
 	if ((flags & FLAG_V))
