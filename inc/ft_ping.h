@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/19 17:18:47 by mcanal           ###   ########.fr       */
+/*   Updated: 2015/11/21 17:22:19 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 
 # define NO_FLAG	0
 # define FLAG_V		1
-# define FLAG_H		2
 /*
+# define FLAG_H		2
 # define FLAG_Q		4
 # define FLAG_T		8
 */
@@ -31,8 +31,13 @@
 # include "libft.h"
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdio.h>
 # include <signal.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/time.h>
 # include <arpa/inet.h>
+# include <netdb.h>
 
 /*
 ** ENUM
@@ -45,7 +50,9 @@ enum	e_error
 	SEG,
 	FPE,
 	INET_NTOP,
-	INET_PTON
+	INET_PTON,
+	ADDRINFO,
+	SOCKET
 };
 
 

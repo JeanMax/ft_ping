@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/19 17:19:45 by mcanal           ###   ########.fr       */
+/*   Updated: 2015/11/21 17:22:11 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,15 @@ void			error(char e, char *msg)
 		failn("inet_ntop failed.");
 	else if (e == INET_PTON)
 		failn("inet_pton failed.");
+	else if (e == ADDRINFO)
+		failn("getaddrinfo failed.");
+	else if (e == SOCKET)
+		failn("socket failed.");
 	else if (e == USAGE)
 	{
 		fail("Usage: ");
 		fail(msg);
-		failn(" [-vh] host");
+		failn(" [-vh] destination");
 	}
 	exit(EXIT_FAILURE);
 }
