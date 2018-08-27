@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 14:47:33 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/27 16:06:14 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ typedef unsigned int	t_dword;
 enum	e_error
 {
 	USAGE,
+	ROOT,
 	MALLOC,
 	INET_NTOP,
 	INET_PTON,
@@ -89,6 +90,19 @@ enum	e_error
 #  define DEBUGF(str, ...) do {} while (0)
 # endif //ANNOYING_DEBUG
 
+/*
+** env struct
+*/
+typedef struct s_env	t_env;
+struct		s_env
+{
+	struct addrinfo		addr_info;
+};
+
+/*
+** GLOBAD
+*/
+extern t_env			g_env;
 
 /*
 **	-error.c
@@ -104,6 +118,7 @@ void					sig_init(void);
 **	-util.c
 */
 void					ft_bzero(void *s, size_t n);
+void					*ft_memcpy(void *dest, const void *src, size_t n);
 
 /*
 **	-ping.c

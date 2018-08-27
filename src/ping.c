@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/27 14:49:33 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/27 15:54:51 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,19 @@ static void debugsock(int sock, struct sockaddr_in *to)
 }
 #endif //ANNOYING_DEBUG
 
-static int				socks_loop(int sock, struct addrinfo *rp)
+static int				socks_loop(struct addrinfo *rp)
 {
-	return (sock != -1 || rp == NULL ? sock : \
-			socks_loop(socket(rp->ai_family, \
-							  rp->ai_socktype, \
-							  rp->ai_protocol), rp->ai_next));
+	int sock;
+
+	if (rp == NULL)
+		return (-1);
+	sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+	if (sock != -1)
+	{
+		ft_memcpy(&g_env.addr_info, rp, sizeof(struct addrinfo));
+		return (sock);
+	}
+	return (socks_loop(rp->ai_next));
 }
 
 static int				get_sock(char *host)
@@ -96,26 +103,34 @@ static int				get_sock(char *host)
 	if (getaddrinfo(host, "http", &hints, &result))
 		error(ADDRINFO, NULL);
 
-	sock = socks_loop(-1, result);
+	sock = socks_loop(result);
 
 	freeaddrinfo(result);
 	return (sock);
 }
 
+static void				print_header(char *host, struct sockaddr_in *to)
+{
+	char	addr[INET6_ADDRSTRLEN];
+
+	if (!inet_ntop(to->sin_family, &(to->sin_addr), addr, INET6_ADDRSTRLEN))
+		error(INET_NTOP, NULL);
+	printf("PING %s (%s) %d(%d) bytes of data.\n", host, addr, 56, 84); //TODO
+}
+
 int						ping(char *host, t_byte flags)
 {
+	/* struct sockaddr_in	from; */
 	struct sockaddr	whereto;
-	struct sockaddr_in	from;
 	struct sockaddr_in	*to;
-
 	int sock;
 
 	(void)flags;
-	to = (struct sockaddr_in *) &whereto;
+
+	to = (struct sockaddr_in *)&whereto;
 	ft_bzero((void *)&whereto, sizeof(struct sockaddr));
 
 	to->sin_family = AF_INET;
-
 	if ((inet_pton(to->sin_family, host, &(to->sin_addr))) <= 0)
 	{
 		to->sin_family = AF_INET6;
@@ -123,16 +138,10 @@ int						ping(char *host, t_byte flags)
 			error(INET_PTON, NULL);
 	}
 
-
 	if ((sock = get_sock(host)) == -1)
 		error(SOCKET, NULL);
 
-/*
-	char	str[INET6_ADDRSTRLEN];
-	if (inet_ntop(to->sin_family, &(to->in_addr), str, INET6_ADDRSTRLEN) == NULL)
-		error(INET_NTOP, NULL);
-	ft_debugstr("str", str); //debug
-*/
+	print_header(host, to);
 
 #ifdef ANNOYING_DEBUG
 	debugsock(sock, to);

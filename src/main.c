@@ -6,11 +6,13 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 14:48:29 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/27 16:09:17 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
+
+t_env g_env	= {0};
 
 
 static t_bool			parse_flags(char *s, t_byte *flags)
@@ -47,6 +49,9 @@ int						main(int ac, char **av)
 	host = NULL;
 	if (ac < 2 || ac > 4 || !(host = parse_av(av + 1, &flags)))
 		error(USAGE, *av);
+
+	if (getuid() != 0)
+		error(ROOT, *av);
 
 	return (ping(host, flags));
 }
