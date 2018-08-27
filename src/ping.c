@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/27 15:54:51 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/27 18:06:37 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,12 +95,12 @@ static int				get_sock(char *host)
 	int	sock;
 
 	ft_bzero((void *)&hints, sizeof(struct addrinfo));
-	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
-	hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
-	hints.ai_flags = 0;
-	hints.ai_protocol = 0;          /* Any protocol */
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_RAW;
+	hints.ai_flags = AI_CANONNAME;
+	hints.ai_protocol = IPPROTO_ICMP;
 
-	if (getaddrinfo(host, "http", &hints, &result))
+	if (getaddrinfo(host, NULL, &hints, &result))
 		error(ADDRINFO, NULL);
 
 	sock = socks_loop(result);
@@ -109,39 +109,33 @@ static int				get_sock(char *host)
 	return (sock);
 }
 
-static void				print_header(char *host, struct sockaddr_in *to)
+static void				print_header(char *host)
 {
-	char	addr[INET6_ADDRSTRLEN];
+	char	addr_buf[INET6_ADDRSTRLEN];
+	void	*addr;
 
-	if (!inet_ntop(to->sin_family, &(to->sin_addr), addr, INET6_ADDRSTRLEN))
+	if (g_env.addr_info.ai_family == AF_INET6)
+		addr = &((struct sockaddr_in6*)(g_env.addr_info.ai_addr))->sin6_addr;
+	else
+		addr = &((struct sockaddr_in*)(g_env.addr_info.ai_addr))->sin_addr;
+
+	if (!inet_ntop(g_env.addr_info.ai_family, \
+				   addr, \
+				   addr_buf, \
+				   INET6_ADDRSTRLEN))
 		error(INET_NTOP, NULL);
-	printf("PING %s (%s) %d(%d) bytes of data.\n", host, addr, 56, 84); //TODO
+	printf("PING %s (%s) %d(%d) bytes of data.\n", host, addr_buf, 56, 84); //TODO
 }
 
 int						ping(char *host, t_byte flags)
 {
-	/* struct sockaddr_in	from; */
-	struct sockaddr	whereto;
-	struct sockaddr_in	*to;
 	int sock;
-
 	(void)flags;
-
-	to = (struct sockaddr_in *)&whereto;
-	ft_bzero((void *)&whereto, sizeof(struct sockaddr));
-
-	to->sin_family = AF_INET;
-	if ((inet_pton(to->sin_family, host, &(to->sin_addr))) <= 0)
-	{
-		to->sin_family = AF_INET6;
-		if ((inet_pton(to->sin_family, host, &(to->sin_addr))) <= 0)
-			error(INET_PTON, NULL);
-	}
 
 	if ((sock = get_sock(host)) == -1)
 		error(SOCKET, NULL);
 
-	print_header(host, to);
+	print_header(host);
 
 #ifdef ANNOYING_DEBUG
 	debugsock(sock, to);
