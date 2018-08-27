@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/21 17:22:11 by mcanal           ###   ########.fr       */
+/*   Updated: 2018/08/27 13:33:47 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,36 +16,19 @@
 
 #include "ft_ping.h"
 
-static void		error_annex(char e, char *msg)
+void			error(enum e_error e, char *msg)
 {
 	if (e == MALLOC)
-		fail("Malloc failed with var: ");
-	failn(msg);
-}
-
-void			error(char e, char *msg)
-{
-	if (e == MALLOC)
-		error_annex(e, msg);
-	else if (e == BUS)
-		failn("Bus error.");
-	else if (e == SEG)
-		failn("Segmentation fault.");
-	else if (e == FPE)
-		failn("Floating point exception.");
+		fprintf(stderr, "Malloc failed with var: %s\n", msg);
 	else if (e == INET_NTOP)
-		failn("inet_ntop failed.");
+		fprintf(stderr, "inet_ntop failed.\n");
 	else if (e == INET_PTON)
-		failn("inet_pton failed.");
+		fprintf(stderr, "inet_pton failed.\n");
 	else if (e == ADDRINFO)
-		failn("getaddrinfo failed.");
+		fprintf(stderr, "getaddrinfo failed.\n");
 	else if (e == SOCKET)
-		failn("socket failed.");
+		fprintf(stderr, "socket failed.\n");
 	else if (e == USAGE)
-	{
-		fail("Usage: ");
-		fail(msg);
-		failn(" [-vh] destination");
-	}
+		fprintf(stderr, "Usage: %s [-vh] destination\n", msg);
 	exit(EXIT_FAILURE);
 }

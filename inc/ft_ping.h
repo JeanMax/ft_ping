@@ -6,29 +6,13 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/21 17:22:19 by mcanal           ###   ########.fr       */
+/*   Updated: 2018/08/27 14:39:17 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_PING_H
-
-/*
-** DEFINE
-*/
 # define FT_PING_H
 
-# define NO_FLAG	0
-# define FLAG_V		1
-/*
-# define FLAG_H		2
-# define FLAG_Q		4
-# define FLAG_T		8
-*/
-
-/*
-** INCLUDE
-*/
-# include "libft.h"
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
@@ -40,45 +24,85 @@
 # include <netdb.h>
 
 /*
-** ENUM
+** bool handling
+*/
+# ifndef TRUE
+#  define TRUE			1
+#  define FALSE			0
+# endif //TRUE
+
+typedef int				t_bool;
+
+/*
+** some types for memory handling
+*/
+typedef unsigned char	t_byte;
+typedef unsigned short	t_word;
+typedef unsigned int	t_dword;
+
+/*
+** command line flags
+*/
+# define NO_FLAG	0
+# define FLAG_V		1
+/*
+# define FLAG_H		2
+# define FLAG_Q		4
+# define FLAG_T		8
+*/
+
+/*
+** error handling
 */
 enum	e_error
 {
 	USAGE,
 	MALLOC,
-	BUS,
-	SEG,
-	FPE,
 	INET_NTOP,
 	INET_PTON,
 	ADDRINFO,
 	SOCKET
 };
 
-
 /*
-** STRUCT && TYPEDEF
-typedef struct s_env	t_env;
-struct		s_env
-{
-	char	 zboub;
-};
+** some colors for pretty printing
 */
+# define CLR_BLACK "\033[30;01m"
+# define CLR_RED "\033[31;01m"
+# define CLR_GREEN "\033[32;01m"
+# define CLR_YELLOW "\033[33;01m"
+# define CLR_BLUE "\033[34;01m"
+# define CLR_MAGENTA "\033[35;01m"
+# define CLR_CYAN "\033[36;01m"
+# define CLR_WHITE "\033[37;01m"
+# define CLR_RESET "\033[0m"
 
 /*
-** GLOBAL
-extern t_env			*g_env;
+** optional debug statements
 */
+/* # define ANNOYING_DEBUG */
+# ifdef ANNOYING_DEBUG
+#  include <stdio.h>
+#  define DEBUG_HEADER CLR_MAGENTA "[DEBUG] " CLR_RESET
+#  define DEBUGF(str, ...) fprintf(stderr, DEBUG_HEADER "<" str ">" CLR_RESET "\n", ##__VA_ARGS__)
+# else
+#  define DEBUGF(str, ...) do {} while (0)
+# endif //ANNOYING_DEBUG
+
 
 /*
-** PROTOTYPES
 **	-error.c
 */
-void					error(char e, char *msg);
+void					error(enum e_error e, char *msg);
 
 /*
 **	-signal.c
 */
 void					sig_init(void);
 
-#endif
+/*
+**	-util.c
+*/
+void					ft_bzero(void *s, size_t n);
+
+#endif //FT_PING_H

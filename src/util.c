@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memset.c                                        :+:      :+:    :+:   */
+/*   util.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/04 15:40:57 by mcanal            #+#    #+#             */
-/*   Updated: 2015/09/11 18:55:31 by mcanal           ###   ########.fr       */
+/*   Created: 2018/08/27 14:12:13 by mc                #+#    #+#             */
+/*   Updated: 2018/08/27 14:13:09 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
-** The  memset()  function  fills  the  first  n  bytes of the memory area
-** pointed to by s with the constant byte c.
+** general purpose functions
 */
 
-#include "libft.h"
+#include "ft_ping.h"
 
-void			*ft_memset(void *s, int c, size_t n)
+
+/*
+** The  bzero()  function sets the first n bytes of the area starting at s
+** to zero (bytes containing '\0').
+*/
+void			ft_bzero(void *s, size_t n)
 {
 	char *swap;
 
@@ -25,7 +29,6 @@ void			*ft_memset(void *s, int c, size_t n)
 	{
 		swap = s;
 		while (n--)
-			*swap++ = (char)c;
+			*swap++ = 0;
 	}
-	return (s);
 }

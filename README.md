@@ -1,8 +1,8 @@
-# ft_select #
+# ft_ping #
 
-select some stuffs...
+pong
 
 
 ### TODO: ###
 
-* vertical resize miss first line
+* do it

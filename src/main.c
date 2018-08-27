@@ -6,14 +6,14 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2015/11/23 16:33:00 by mcanal           ###   ########.fr       */
+/*   Updated: 2018/08/27 14:38:05 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
 
-static t_bool			parse_flags(char *s, t_char *flags)
+static t_bool			parse_flags(char *s, t_byte *flags)
 {
 	if (!*s)
 		return (TRUE);
@@ -27,7 +27,7 @@ static t_bool			parse_flags(char *s, t_char *flags)
 	return (parse_flags(s + 1, flags));
 }
 
-static char				*parse_av(char **av, t_char *flags)
+static char				*parse_av(char **av, t_byte *flags)
 {
 	if (!(*av) || **av != '-')
 		return (*av && *(av + 1) ? NULL : *av);
@@ -68,29 +68,28 @@ static int				get_sock(char *host)
 	return (sock);
 }
 
- //debug
+#ifdef ANNOYING_DEBUG
 static void debugmsg(struct msghdr *msg)
 {
-	ft_putendl("-----------------------------------");
-	ft_debugnbr("namelen", msg->msg_namelen);
-	ft_putstr("<name:");
-	write(1, msg->msg_name, msg->msg_namelen);
-	ft_putendl(">");
-	
-	ft_debugnbr("iolen", msg->msg_iovlen);
+	DEBUGF("-----------------------------------");
+	DEBUGF("namelen: %d", msg->msg_namelen);
+	DEBUGF("name:");
+	write(2, msg->msg_name, msg->msg_namelen);
+	write(2, "\n", 1);
+
+	DEBUGF("iolen: %zu", msg->msg_iovlen);
 //	if (msg->msg_iovlen > 0)
 //	{
-		ft_putstr("<iobase:");
+		DEBUGF("iobase:");
 //		write(1, msg->msg_iov->iov_base, msg->msg_iov->iov_len);
-		write(1, msg->msg_iov->iov_base, 4);
-		ft_putendl(">");
+		write(2, msg->msg_iov->iov_base, 4);
+		write(2, "\n", 1);
 //	}
 
-	ft_debugnbr("controllen", msg->msg_controllen);
-	ft_debugnbr("flags", msg->msg_flags);
-	ft_putendl("-----------------------------------");
+	DEBUGF("controllen: %zu", msg->msg_controllen);
+	DEBUGF("flags: %d", msg->msg_flags);
+	DEBUGF("-----------------------------------");
 }
- //debug
 
 static void debugsock(int sock, struct sockaddr_in *to)
 {
@@ -104,7 +103,7 @@ static void debugsock(int sock, struct sockaddr_in *to)
 	{
 		if (recvmsg(sock, &msg, 0) < 0)
 			perror("recvmsg() failed");
-		ft_putendl("recv:"); //debug
+		DEBUGF("recv:"); //debug
 		debugmsg(&msg); //debug
 	}
 	else
@@ -117,22 +116,21 @@ static void debugsock(int sock, struct sockaddr_in *to)
 		iov.iov_base = ft_strdup("toto");
 //		ft_memcpy(iov.iov_base, "toto", 4);
 
-		
+
 		iov.iov_len = 5;
-		ft_putendl("\nsend:"); //debug
+		DEBUGF("send:"); //debug
 		debugmsg(&msg); //debug
 		if (sendmsg(sock, &msg, 0) < 0)
-			perror("sendmsg() failed");
+ 			perror("sendmsg() failed");
 //		sendto(sock, &msg, sizeof(msg), 0, to, sizeof(to));
 		exit(0);
 	}
-		
-	
 }
+#endif //ANNOYING_DEBUG
 
 int						main(int ac, char **av)
 {
-	t_char	flags;
+	t_byte	flags;
 	char	*host;
 	struct sockaddr	whereto;
 	struct sockaddr_in	from;
@@ -163,21 +161,21 @@ int						main(int ac, char **av)
 		error(SOCKET, NULL);
 
 
-/*	
+/*
 	char	str[INET6_ADDRSTRLEN];
 	if (inet_ntop(to->sin_family, &(to->in_addr), str, INET6_ADDRSTRLEN) == NULL)
 		error(INET_NTOP, NULL);
 	ft_debugstr("str", str); //debug
 */
 
-	
-	 //debug
+
+#ifdef ANNOYING_DEBUG
 	debugsock(sock, to);
-	ft_debugstr("host", host);
-	ft_debugnbr("sock", sock);
+	DEBUGF("host: %s", host);
+	DEBUGF("sock: %d", sock);
 	if ((flags & FLAG_V))
-		ft_debugnbr("FLAG V", (int)flags);
-	//debug
-	
+		DEBUGF("FLAG V: %d", (int)flags);
+#endif //ANNOYING_DEBUG
+
 	return (EXIT_FAILURE);
 }

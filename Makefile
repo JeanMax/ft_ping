@@ -6,89 +6,162 @@
 #    By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/29 13:16:03 by mcanal            #+#    #+#              #
-#    Updated: 2015/11/19 15:20:35 by mcanal           ###   ########.fr        #
+#    Updated: 2018/08/27 14:40:55 by mc               ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-NAME = ft_ping
-SRC = main.c signal.c error.c
-O_DIR = obj
-C_DIR = src
-VPATH =	src
+##
+## CUSTOM CONFIG
+##
 
-SRCC = $(addprefix $(C_DIR)/,$(SRC))
-OBJS =	$(SRC:%.c=$(O_DIR)/%.o)
-DEPS =  $(OBJS:%.o=%.d)
+# name of the binary to make
+PROJECT = ft_ping
 
-LIB = libft/libft.a
-I_DIR = -I./libft/inc/ -I./inc/
-CFLAGS = -Wall -Wextra -Werror -O2
-RM = rm -rf
-MKDIR = mkdir -p
+# file-names of the sources
+SRC_NAME = main.c util.c signal.c error.c
 
-ifeq ($(shell uname), Linux)
-CC = clang-3.5
-else
-CC = clang
-endif
+# folder-names of the sources
+SRC_PATH = src
 
-WHITE = \033[37;01m
-RED = \033[31;01m
-GREEN =  \033[32;01m
-BLUE =  \033[34;01m
-BASIC = \033[0m
+# folder-names containing headers files
+INC_PATH = inc
 
-.PHONY: all debug debug_lib sanitize sanitize_lib me_cry lib clean fclean zclean re brute
+# where are your tests?
+TEST_DIR = test
 
-all: lib
-	@$(MAKE) $(NAME)
+# extra libraries needed for linking
+LDLIBS =
 
-debug: CFLAGS = -g -ggdb -O2
-debug: debug_lib $(NAME)
-debug_lib:
-	@$(MAKE) -C libft debug
+# linking flags
+LDFLAGS =
 
-sanitize: CFLAGS = -g -ggdb -O2 -fsanitize=address,undefined -ferror-limit=5
-sanitize: sanitize_lib $(NAME)
-sanitize_lib:
-	@$(MAKE) -C libft sanitize
+# compilation flags
+CPPFLAGS =
 
-me_cry: CFLAGS += -Wpedantic -Wshadow -Wcast-qual -Wconversion -Wcast-align \
-				  -Wstrict-prototypes -Wmissing-prototypes -Wunreachable-code \
-				  -Winit-self -Wmissing-declarations -Wnonnull -Wuninitialized \
-				  -Wfloat-equal -Wbad-function-cast -Wundef -Waggregate-return \
-				  -Wstrict-overflow=5
-me_cry: lib $(NAME)
 
-lib:
-	@$(MAKE) -C libft
+##
+## GLOBAL VARIABLES
+##
 
--include $(DEPS)
+# compilation/linking flags for the differents public rules
+WFLAGS = -Wextra -Wall  # warnings
+RCFLAGS = $(WFLAGS) -Werror -O2  # release
+DCFLAGS = $(WFLAGS) -g -DDEBUG  # debug
+SCFLAGS = $(DCFLAGS) -fsanitize=address,undefined -ferror-limit=5  # sanitize
+WWFLAGS = $(WFLAGS) -Wpedantic -Wshadow -Wconversion -Wcast-align \
+  -Wstrict-prototypes -Wmissing-prototypes -Wunreachable-code -Winit-self \
+  -Wmissing-declarations -Wfloat-equal -Wbad-function-cast -Wundef \
+  -Waggregate-return -Wstrict-overflow=5 -Wold-style-definition -Wpadded \
+  -Wredundant-decls  # moar warnings
 
-$(NAME): $(OBJS) $(LIB)
-	@$(CC) $(CFLAGS) $(I_DIR) $(OBJS) $(LIB) -o $@
-	@echo "$(BLUE)$(OBJS) $(WHITE)->$(RED) $@ $(BASIC)"
-	@echo "$(WHITE)flags:$(BASIC) $(CFLAGS)"
-	@echo "$(WHITE)compi:$(BASIC) $(CC)"
+# folder used to store all compilations sub-products (.o and .d mostly)
+OBJ_DIR ?= obj
+OBJ_PATH ?= $(OBJ_DIR)/rel
+OBJ = $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.c=.o))
+DEP = $(OBJ:.o=.d)
 
-$(O_DIR)/%.o: %.c
-	@$(CC) $(CFLAGS) $(I_DIR) -MMD -c $< -o $@
-	@echo "$(WHITE)$<\t->$(BLUE) $@ $(BASIC)"
+# includes
+INC = $(addprefix -I, $(INC_PATH))
 
-$(OBJS): | $(O_DIR)
+# specify flags for commands used in the following rules
+LN =		ln -s
+RM =		rm -f
+RMDIR =		rmdir
+MKDIR =		mkdir -p
+CC =		clang
+MAKE ?=		make -j$(shell nproc 2>/dev/null || echo 4)
+SUB_MAKE =	make -C
 
-$(O_DIR):
-	@$(MKDIR) $(O_DIR)
+# default to "pretty" Makefile, but you can run ´VERBOSE=t make´
+# ifndef VERBOSE
+#  ifndef TRAVIS
+# .SILENT:
+#  endif
+# endif
+# PRINTF = test $(VERBOSE)$(TRAVIS) || printf
 
+# some colors for pretty printing
+WHITE =		\033[37m
+RED =		\033[31m
+GREEN =		\033[32m
+YELLOW =	\033[33m
+BLUE =		\033[34m
+BASIC =		\033[0m
+
+
+##
+## PUBLIC RULES
+##
+
+# release build
+all:
+	+$(MAKE) $(PROJECT) "CFLAGS = $(RCFLAGS)" "OBJ_PATH = $(OBJ_DIR)/rel"
+
+# masochist build
+mecry:
+	+$(MAKE) $(PROJECT) "CFLAGS = $(WWFLAGS)" "OBJ_PATH = $(OBJ_DIR)/rel"
+
+# build for gdb/valgrind debugging
+dev:
+	+$(MAKE) $(PROJECT).dev \
+		"PROJECT = $(PROJECT).dev" \
+		"CFLAGS = $(DCFLAGS)" "OBJ_PATH = $(OBJ_DIR)/dev"
+
+# build for runtime debugging (fsanitize)
+san:
+	+$(MAKE) $(PROJECT).san \
+		"PROJECT = $(PROJECT).san" \
+		"CFLAGS = $(SCFLAGS)" "OBJ_PATH = $(OBJ_DIR)/san"
+
+# remove all generated .o and .d
 clean:
-	@$(RM) $(O_DIR)
+	$(RM) $(OBJ) $(DEP)
+	$(RM) $(OBJ:$(OBJ_DIR)/rel%=$(OBJ_DIR)/dev%)
+	$(RM) $(DEP:$(OBJ_DIR)/rel%=$(OBJ_DIR)/dev%)
+	$(RM) $(OBJ:$(OBJ_DIR)/rel%=$(OBJ_DIR)/san%)
+	$(RM) $(DEP:$(OBJ_DIR)/rel%=$(OBJ_DIR)/san%)
+	test -d $(OBJ_DIR) && find $(OBJ_DIR) -name '*.[od]' | xargs $(RM) || true
 
+# remove the generated binary, and all .o and .d
 fclean: clean
-	@$(RM) $(NAME)
+	test -d $(OBJ_DIR) \
+&& find $(OBJ_DIR) -type d | sort -r | xargs $(RMDIR) || true
+	$(RM) $(PROJECT) $(PROJECT).san $(PROJECT).dev
 
-zclean: fclean
-	@make -C libft fclean
+# some people like it real clean
+mrproper:
+	$(RM) -r $(OBJ_DIR)
+	$(RM) -r $(TEST_DIR)
+	+$(MAKE) fclean
 
-re: fclean all
+# clean build and recompile
+re: fclean
+	+$(MAKE) all
 
-brute: zclean all
+# run tests on project
+test: all
+	$(PRINTF) "All tests passed!\n"
+
+
+##
+## PRIVATE RULES
+##
+
+# create binary (link)
+$(PROJECT): $(OBJ)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ) $(LDLIBS) -o $@
+
+# create object files (compile)
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(INC) -MMD -MP -c $< -o $@
+
+# create directory for compilation sub-products
+$(OBJ_PATH):
+	$(MKDIR) $(dir $(OBJ))
+
+# read dependencies list generated by -MMD flag
+-include $(DEP)
+
+# just to avoid conflicts between rules and files/folders names
+.PHONY: all, dev, san, mecry, $(PROJECT), \
+clean, fclean, mrproper, re, test, testdev, testsan
