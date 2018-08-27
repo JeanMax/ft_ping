@@ -6,7 +6,7 @@
 #    By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/29 13:16:03 by mcanal            #+#    #+#              #
-#    Updated: 2018/08/27 14:40:55 by mc               ###   ########.fr        #
+#    Updated: 2018/08/27 14:47:26 by mc               ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -18,7 +18,7 @@
 PROJECT = ft_ping
 
 # file-names of the sources
-SRC_NAME = main.c util.c signal.c error.c
+SRC_NAME = main.c ping.c signal.c error.c util.c
 
 # folder-names of the sources
 SRC_PATH = src

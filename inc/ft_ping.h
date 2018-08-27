@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 14:39:17 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/27 14:47:33 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,5 +104,10 @@ void					sig_init(void);
 **	-util.c
 */
 void					ft_bzero(void *s, size_t n);
+
+/*
+**	-ping.c
+*/
+int						ping(char *host, t_byte flags);
 
 #endif //FT_PING_H
