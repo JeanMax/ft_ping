@@ -6,72 +6,11 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/27 18:06:37 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/28 16:43:33 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
-
-
-#ifdef ANNOYING_DEBUG
-static void debugmsg(struct msghdr *msg)
-{
-	DEBUGF("-----------------------------------");
-	DEBUGF("namelen: %d", msg->msg_namelen);
-	DEBUGF("name:");
-	write(2, msg->msg_name, msg->msg_namelen);
-	write(2, "\n", 1);
-
-	DEBUGF("iolen: %zu", msg->msg_iovlen);
-//	if (msg->msg_iovlen > 0)
-//	{
-		DEBUGF("iobase:");
-//		write(1, msg->msg_iov->iov_base, msg->msg_iov->iov_len);
-		write(2, msg->msg_iov->iov_base, 4);
-		write(2, "\n", 1);
-//	}
-
-	DEBUGF("controllen: %zu", msg->msg_controllen);
-	DEBUGF("flags: %d", msg->msg_flags);
-	DEBUGF("-----------------------------------");
-}
-
-static void debugsock(int sock, struct sockaddr_in *to)
-{
-	struct msghdr msg;
-	struct iovec iov;
-
-	ft_bzero((void *)&msg, sizeof(msg));
-	ft_bzero((void *)&iov, sizeof(iov));
-
-	if (fork())
-	{
-		if (recvmsg(sock, &msg, 0) < 0)
-			perror("recvmsg() failed");
-		DEBUGF("recv:"); //debug
-		debugmsg(&msg); //debug
-	}
-	else
-	{
-//		sleep(1);
-		msg.msg_name = to->sin_addr;
-		msg.msg_namelen = to->sin_addrlen;
-		msg.msg_iov = &iov;
-		msg.msg_iovlen = 1;
-		iov.iov_base = ft_strdup("toto");
-//		ft_memcpy(iov.iov_base, "toto", 4);
-
-
-		iov.iov_len = 5;
-		DEBUGF("send:"); //debug
-		debugmsg(&msg); //debug
-		if (sendmsg(sock, &msg, 0) < 0)
- 			perror("sendmsg() failed");
-//		sendto(sock, &msg, sizeof(msg), 0, to, sizeof(to));
-		exit(0);
-	}
-}
-#endif //ANNOYING_DEBUG
 
 static int				socks_loop(struct addrinfo *rp)
 {
@@ -90,14 +29,12 @@ static int				socks_loop(struct addrinfo *rp)
 
 static int				get_sock(char *host)
 {
-	struct addrinfo hints;
+	struct addrinfo hints = {0};
 	struct addrinfo *result;
 	int	sock;
 
-	ft_bzero((void *)&hints, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_RAW;
-	hints.ai_flags = AI_CANONNAME;
 	hints.ai_protocol = IPPROTO_ICMP;
 
 	if (getaddrinfo(host, NULL, &hints, &result))
@@ -112,19 +49,76 @@ static int				get_sock(char *host)
 static void				print_header(char *host)
 {
 	char	addr_buf[INET6_ADDRSTRLEN];
-	void	*addr;
 
-	if (g_env.addr_info.ai_family == AF_INET6)
-		addr = &((struct sockaddr_in6*)(g_env.addr_info.ai_addr))->sin6_addr;
-	else
-		addr = &((struct sockaddr_in*)(g_env.addr_info.ai_addr))->sin_addr;
-
-	if (!inet_ntop(g_env.addr_info.ai_family, \
-				   addr, \
-				   addr_buf, \
-				   INET6_ADDRSTRLEN))
+	if (!inet_ntop(
+			g_env.addr_info.ai_family,									\
+			&((struct sockaddr_in *)(g_env.addr_info.ai_addr))->sin_addr, \
+			addr_buf,													\
+			INET6_ADDRSTRLEN
+		))
 		error(INET_NTOP, NULL);
 	printf("PING %s (%s) %d(%d) bytes of data.\n", host, addr_buf, 56, 84); //TODO
+}
+
+// Function: checksum
+//
+// Description:
+//    This function calculates the 16-bit one's complement sum
+//    of the supplied buffer (ICMP) header
+//
+t_word checksum(t_word *buffer, int size)
+{
+    t_dword cksum = 0;
+
+    while (size > 1)
+    {
+        cksum += *buffer++;
+        size -= sizeof(t_word);
+    }
+    if (size)
+        cksum += *(t_byte *)buffer;
+    cksum = (cksum >> 16) + (cksum & 0xffff);
+    cksum += (cksum >>16);
+    return (t_word)(~cksum);
+}
+
+static int				send_packet(int sock)
+{
+	static t_packet	packet = {{0}, {0}, {0}};
+	ssize_t			bwrote;
+
+	if (!packet.header.type)
+	{
+		packet.header.type = ICMP_ECHO;
+		packet.header.un.echo.id = getpid(); //TODO: reverse endianess?
+		ft_memcpy(&packet.data, "zboub", 6);
+	}
+	packet.header.un.echo.sequence++;  //TODO: reverse endianess?
+	gettimeofday(&packet.timestamp, NULL);
+	packet.header.checksum = 0;
+	packet.header.checksum = checksum((t_word *)&packet, sizeof(packet));
+
+	bwrote = sendto(sock, &packet, sizeof(packet), 0,
+					g_env.addr_info.ai_addr,
+					g_env.addr_info.ai_addrlen);
+	if (bwrote < 0)
+	{
+		perror("send");									/* DEBUG */
+		printf("\nPacket Sending Failed! (%zd)\n", bwrote); /* DEBUG */
+		return (EXIT_FAILURE);
+	}
+	if (bwrote < (ssize_t)sizeof(packet))
+	{
+		printf("Wrote %zd/%zu bytes\n", bwrote, sizeof(packet)); /* DEBUG */
+	}
+
+	return (EXIT_SUCCESS);
+}
+
+static int				recv_packet(int sock)
+{
+	(void)sock;
+	return 42;
 }
 
 int						ping(char *host, t_byte flags)
@@ -135,15 +129,31 @@ int						ping(char *host, t_byte flags)
 	if ((sock = get_sock(host)) == -1)
 		error(SOCKET, NULL);
 
-	print_header(host);
+	// setting timeout of recv setting
+	/* struct timeval tv_out; */
+    /* tv_out.tv_sec = RECV_TIMEOUT; */
+    /* tv_out.tv_usec = 0; */
+    /* setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, */
+	/* 		   (const char*)&tv_out, sizeof tv_out); */
 
-#ifdef ANNOYING_DEBUG
-	debugsock(sock, to);
-	DEBUGF("host: %s", host);
-	DEBUGF("sock: %d", sock);
-	if ((flags & FLAG_V))
-		DEBUGF("FLAG V: %d", (int)flags);
-#endif //ANNOYING_DEBUG
+	// set socket options at ip to TTL and value to ttl_val
+	/* int ttl_val = 64; */
+    /* if (setsockopt(sock, SOL_IP, IP_TTL, */
+	/* 			   &ttl_val, sizeof(ttl_val)) != 0) */
+    /* { */
+    /*     printf("\nSetting socket options to TTL failed!\n"); */
+    /*     return (EXIT_FAILURE); */
+    /* } */
+
+	if (g_env.addr_info.ai_family == AF_INET6)
+	{
+		printf("no ipv6 plz\n");	/* DEBUG */
+		return EXIT_FAILURE;
+	}
+
+	print_header(host);
+	send_packet(sock);
+	recv_packet(sock);
 
 	return (EXIT_FAILURE);
 }

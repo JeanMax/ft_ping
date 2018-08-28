@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 16:06:14 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/28 16:44:10 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@
 # include <sys/socket.h>
 # include <sys/time.h>
 # include <arpa/inet.h>
+# include <netinet/ip.h>
+# include <netinet/ip_icmp.h>
 # include <netdb.h>
+
 
 /*
 ** bool handling
@@ -89,6 +92,19 @@ enum	e_error
 # else
 #  define DEBUGF(str, ...) do {} while (0)
 # endif //ANNOYING_DEBUG
+
+
+/*
+** packet struct
+*/
+#define PACKET_SIZE  32
+typedef struct s_packet	t_packet;
+struct		s_packet
+{
+	struct icmphdr		header;
+	struct timeval		timestamp;
+	t_byte				data[PACKET_SIZE];
+};
 
 /*
 ** env struct
