@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 16:08:15 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/29 12:33:57 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void			error(enum e_error e, char *msg)
 		fprintf(stderr, "getaddrinfo failed.\n");
 	else if (e == SOCKET)
 		fprintf(stderr, "socket failed.\n");
+	else if (e == IPV6)
+		fprintf(stderr, "IPv6 protocol is not implemented.\n");
 	else if (e == USAGE)
 		fprintf(stderr, "Usage: %s [-vh] destination\n", msg);
 	exit(EXIT_FAILURE);

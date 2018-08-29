@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/28 16:44:10 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/29 12:33:08 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ enum	e_error
 	INET_NTOP,
 	INET_PTON,
 	ADDRINFO,
-	SOCKET
+	SOCKET,
+	IPV6
 };
 
 /*
@@ -140,5 +141,16 @@ void					*ft_memcpy(void *dest, const void *src, size_t n);
 **	-ping.c
 */
 int						ping(char *host, t_byte flags);
+
+/*
+** -socket.c
+*/
+int						get_sock(char *host);
+
+/*
+** -packet.c
+*/
+int						send_packet(int sock);
+int						recv_packet(int sock);
 
 #endif //FT_PING_H
