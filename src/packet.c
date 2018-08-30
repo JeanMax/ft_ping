@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 13:13:42 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 19:08:13 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,20 @@ static t_word			checksum(t_word *buffer, int size)
 	return (t_word)(~cksum);
 }
 
+static double			get_packet_delay(struct timeval *since, struct timeval *now)
+{
+	return (double)(now->tv_sec - since->tv_sec) * 1000. \
+		+ (double)(now->tv_usec - since->tv_usec) / 1000.;
+}
+
 static int				validate_msg(t_byte *msg)
 {
     struct iphdr	*ip = NULL;
     struct icmphdr	*icmp = NULL;
 	t_word			check;
+	struct timeval	timestamp;
 
+	gettimeofday(&timestamp, NULL);
     ip = (struct iphdr *)msg;
     icmp = (struct icmphdr *)(msg + ip->ihl * sizeof(t_dword));
 
@@ -66,9 +74,19 @@ static int				validate_msg(t_byte *msg)
         return (EXIT_FAILURE);
     }
 
-    printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
+	if (ft_memcmp(
+			((t_byte *)icmp + sizeof(struct icmphdr) + sizeof(struct timeval)),
+			"zboub",
+			6))
+	{
+        DEBUGF("msg data corrupted"); /* DEBUG */
+        return (EXIT_FAILURE);
+	}
+
+    printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.2f ms\n",
 		   sizeof(t_packet), g_env.addr_str,
-		   icmp->un.echo.sequence, ip->ttl, 42.2); //TODO
+		   icmp->un.echo.sequence, ip->ttl,
+		   get_packet_delay((struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)), &timestamp));
 
     return (EXIT_SUCCESS);
 }
@@ -78,7 +96,6 @@ int						recv_packet(void)
 	struct msghdr	msg = {0};
 	struct iovec	iov = {0};
 	t_byte			iov_base[IOV_BUF_SIZE] = {0};
-	struct timeval	timestamp;
 	ssize_t			ret;
 
 	msg.msg_name = g_env.addr_info.ai_addr;
@@ -89,7 +106,6 @@ int						recv_packet(void)
 	iov.iov_len = IOV_BUF_SIZE;
 
 	ret = recvmsg(g_env.sock, &msg, 0);
-	gettimeofday(&timestamp, NULL);
 	if (ret	< 0 || ret != sizeof(t_packet))
 	{
 		perror("recv");			/* DEBUG */
@@ -101,7 +117,7 @@ int						recv_packet(void)
 
 int						send_packet(void)
 {
-	static t_packet	packet = {{0}, {0}, {0}}; //TODO
+	static t_packet	packet = {{0}, {0}, {0}};
 	ssize_t			bwrote;
 
 	if (!packet.header.type)

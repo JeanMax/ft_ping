@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 13:45:59 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 19:05:21 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ void					sig_init(t_dword usec_interval);
 */
 void					ft_bzero(void *s, size_t n);
 void					*ft_memcpy(void *dest, const void *src, size_t n);
+int						ft_memcmp(const void *s1, const void *s2, size_t n);
 
 /*
 **	-ping.c
