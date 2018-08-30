@@ -6,13 +6,13 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/27 16:09:17 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 13:05:00 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
-t_env g_env	= {0};
+t_env g_env	= {{0}, {0}, -1};
 
 
 static t_bool			parse_flags(char *s, t_byte *flags)

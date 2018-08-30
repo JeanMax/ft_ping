@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/29 12:33:08 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 13:45:59 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,13 @@ typedef int				t_bool;
 typedef unsigned char	t_byte;
 typedef unsigned short	t_word;
 typedef unsigned int	t_dword;
+
+
+/*
+** time helper
+*/
+# define SEC_TO_USEC(x) (t_dword)((x) * 1e6)
+# define USEC_TO_SEC(x) ((double)(x) / 1e6)
 
 /*
 ** command line flags
@@ -98,7 +105,7 @@ enum	e_error
 /*
 ** packet struct
 */
-#define PACKET_SIZE  32
+#define PACKET_SIZE  40
 typedef struct s_packet	t_packet;
 struct		s_packet
 {
@@ -107,6 +114,8 @@ struct		s_packet
 	t_byte				data[PACKET_SIZE];
 };
 
+# define IOV_BUF_SIZE (sizeof(t_packet))
+
 /*
 ** env struct
 */
@@ -114,6 +123,8 @@ typedef struct s_env	t_env;
 struct		s_env
 {
 	struct addrinfo		addr_info;
+	char				addr_str[INET6_ADDRSTRLEN];
+	int					sock;
 };
 
 /*
@@ -129,7 +140,7 @@ void					error(enum e_error e, char *msg);
 /*
 **	-signal.c
 */
-void					sig_init(void);
+void					sig_init(t_dword usec_interval);
 
 /*
 **	-util.c
@@ -150,7 +161,7 @@ int						get_sock(char *host);
 /*
 ** -packet.c
 */
-int						send_packet(int sock);
-int						recv_packet(int sock);
+int						send_packet(void);
+int						recv_packet(void);
 
 #endif //FT_PING_H

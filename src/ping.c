@@ -6,33 +6,17 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/29 12:48:42 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 13:50:08 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
-
-static void				print_header(char *host)
-{
-	char	addr_buf[INET6_ADDRSTRLEN];
-
-	if (!inet_ntop(
-			g_env.addr_info.ai_family,									\
-			&((struct sockaddr_in *)(void *)g_env.addr_info.ai_addr)->sin_addr,	\
-			addr_buf,													\
-			INET6_ADDRSTRLEN
-		))
-		error(INET_NTOP, NULL);
-	printf("PING %s (%s) %d(%d) bytes of data.\n", host, addr_buf, 56, 84); //TODO
-}
-
 int						ping(char *host, t_byte flags)
 {
-	int sock;
 	(void)flags;
 
-	if ((sock = get_sock(host)) == -1)
+	if ((g_env.sock = get_sock(host)) == -1)
 		error(SOCKET, NULL);
 
 	// setting timeout of recv setting
@@ -53,10 +37,19 @@ int						ping(char *host, t_byte flags)
 
 	if (g_env.addr_info.ai_family == AF_INET6)
 		error(IPV6, NULL);
+	if (!inet_ntop(
+			g_env.addr_info.ai_family,									\
+			&((struct sockaddr_in *)(void *)g_env.addr_info.ai_addr)->sin_addr,	\
+			g_env.addr_str,
+			INET6_ADDRSTRLEN
+		))
+		error(INET_NTOP, NULL);
 
-	print_header(host);
-	send_packet(sock);
-	recv_packet(sock);
+	sig_init(SEC_TO_USEC(3.14)); //TODO
+	printf("PING %s (%s) %d(%d) bytes of data.\n",
+		   host, g_env.addr_str, 56, 84); //TODO
+	while (42)
+		recv_packet();
 
 	return (EXIT_FAILURE);
 }
