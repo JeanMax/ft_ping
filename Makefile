@@ -6,7 +6,7 @@
 #    By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/29 13:16:03 by mcanal            #+#    #+#              #
-#    Updated: 2018/08/29 12:32:02 by mc               ###   ########.fr        #
+#    Updated: 2018/08/30 20:04:41 by mc               ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -30,7 +30,7 @@ INC_PATH = inc
 TEST_DIR = test
 
 # extra libraries needed for linking
-LDLIBS =
+LDLIBS = -lm
 
 # linking flags
 LDFLAGS =

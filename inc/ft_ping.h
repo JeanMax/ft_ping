@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 19:05:21 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 19:57:43 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <netinet/ip.h>
 # include <netinet/ip_icmp.h>
 # include <netdb.h>
+# include <math.h>
 
 
 /*
@@ -43,6 +44,16 @@ typedef unsigned char	t_byte;
 typedef unsigned short	t_word;
 typedef unsigned int	t_dword;
 
+/*
+** this is always useful
+*/
+# ifndef MIN
+#  define MIN(a, b) ((a) < (b) ? (a) : (b))
+# endif
+
+# ifndef MAX
+#  define MAX(a, b) ((a) > (b) ? (a) : (b))
+# endif
 
 /*
 ** time helper
@@ -117,6 +128,20 @@ struct		s_packet
 # define IOV_BUF_SIZE (sizeof(t_packet))
 
 /*
+** packet stats struct
+*/
+typedef struct s_packet_stats	t_packet_stats;
+struct		s_packet_stats
+{
+	t_word				n_sent;
+	t_word				n_received;
+	long double			trip_time_sum;
+	long double			trip_time_sum_squared;
+	double				max_trip_time;
+	double				min_trip_time;
+};
+
+/*
 ** env struct
 */
 typedef struct s_env	t_env;
@@ -124,7 +149,9 @@ struct		s_env
 {
 	struct addrinfo		addr_info;
 	char				addr_str[INET6_ADDRSTRLEN];
+	char				*host;
 	int					sock;
+	t_packet_stats		stats;
 };
 
 /*
@@ -152,12 +179,12 @@ int						ft_memcmp(const void *s1, const void *s2, size_t n);
 /*
 **	-ping.c
 */
-int						ping(char *host, t_byte flags);
+int						ping(t_byte flags);
 
 /*
 ** -socket.c
 */
-int						get_sock(char *host);
+int						get_sock(void);
 
 /*
 ** -packet.c

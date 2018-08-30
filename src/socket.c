@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:27:55 by mc                #+#    #+#             */
-/*   Updated: 2018/08/29 12:28:25 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 19:48:37 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static int				socks_loop(struct addrinfo *rp)
 	return (socks_loop(rp->ai_next));
 }
 
-int						get_sock(char *host)
+int						get_sock(void)
 {
 	struct addrinfo hints = {0};
 	struct addrinfo *result;
@@ -38,7 +38,7 @@ int						get_sock(char *host)
 	hints.ai_socktype = SOCK_RAW;
 	hints.ai_protocol = IPPROTO_ICMP;
 
-	if (getaddrinfo(host, NULL, &hints, &result))
+	if (getaddrinfo(g_env.host, NULL, &hints, &result))
 		error(ADDRINFO, NULL);
 
 	sock = socks_loop(result);

@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 15:32:22 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 20:14:24 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,25 @@
 
 static void		interupt_handler(int i)
 {
-	(void)i;
-	//TODO: print stats
-	/* tsum += triptime; */
-	/* tsum2 += (long long)triptime * (long long)triptime; */
-	/* tsum /= nreceived + nrepeats; */
-	/* tsum2 /= nreceived + nrepeats; */
-	/* tmdev = llsqrt(tsum2 - tsum * tsum); */
+	double avg = (double)g_env.stats.trip_time_sum / (double)g_env.stats.n_received;
 
-	/* mdev = SQRT(SUM(RTT*RTT) / N – (SUM(RTT)/N)^2) */
+	(void)i;
+	printf("\n--- %s ping statistics ---\n"
+		   "%u packets transmitted, %u received, %.3g%% packet loss, time %ums\n"
+		   "rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3Lf ms\n",
+		   g_env.host,
+		   g_env.stats.n_sent, g_env.stats.n_received,
+		   100 - (double)(g_env.stats.n_received / g_env.stats.n_sent) * 100.,
+		   (t_dword)g_env.stats.trip_time_sum, //TODO: this is wrong
+		   g_env.stats.min_trip_time,
+		   avg,
+		   g_env.stats.max_trip_time,
+		   sqrtl(
+			   g_env.stats.trip_time_sum_squared / g_env.stats.n_received
+			   - (long double)avg * (long double)avg
+			   )
+		);
+
 	exit(EXIT_SUCCESS);
 }
 

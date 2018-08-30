@@ -6,17 +6,17 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 19:02:17 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 19:49:14 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
-int						ping(char *host, t_byte flags)
+int						ping(t_byte flags)
 {
 	(void)flags;
 
-	if ((g_env.sock = get_sock(host)) == -1)
+	if ((g_env.sock = get_sock()) == -1)
 		error(SOCKET, NULL);
 
 	// setting timeout of recv setting
@@ -47,7 +47,7 @@ int						ping(char *host, t_byte flags)
 
 	sig_init(SEC_TO_USEC(1.)); //TODO
 	printf("PING %s (%s) %d(%d) bytes of data.\n",
-		   host, g_env.addr_str, 56, 84); //TODO
+		   g_env.host, g_env.addr_str, 56, 84); //TODO
 	while (42)
 		recv_packet();
 

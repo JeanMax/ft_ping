@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 19:08:13 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 20:00:01 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static t_word			checksum(t_word *buffer, int size)
 	return (t_word)(~cksum);
 }
 
-static double			get_packet_delay(struct timeval *since, struct timeval *now)
+static double			get_packet_trip_time(struct timeval *since, struct timeval *now)
 {
 	return (double)(now->tv_sec - since->tv_sec) * 1000. \
 		+ (double)(now->tv_usec - since->tv_usec) / 1000.;
@@ -48,6 +48,7 @@ static int				validate_msg(t_byte *msg)
     struct icmphdr	*icmp = NULL;
 	t_word			check;
 	struct timeval	timestamp;
+	double			trip_time;
 
 	gettimeofday(&timestamp, NULL);
     ip = (struct iphdr *)msg;
@@ -76,17 +77,25 @@ static int				validate_msg(t_byte *msg)
 
 	if (ft_memcmp(
 			((t_byte *)icmp + sizeof(struct icmphdr) + sizeof(struct timeval)),
-			"zboub",
-			6))
+			"zboub", 6))
 	{
         DEBUGF("msg data corrupted"); /* DEBUG */
         return (EXIT_FAILURE);
 	}
 
-    printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.2f ms\n",
+	trip_time = get_packet_trip_time(
+		(struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)),
+		&timestamp);
+	g_env.stats.n_received++;
+	g_env.stats.trip_time_sum += (long double)trip_time;
+	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
+	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
+	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
+
+	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.2f ms\n",
 		   sizeof(t_packet), g_env.addr_str,
 		   icmp->un.echo.sequence, ip->ttl,
-		   get_packet_delay((struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)), &timestamp));
+		   trip_time);
 
     return (EXIT_SUCCESS);
 }
@@ -126,7 +135,7 @@ int						send_packet(void)
 		packet.header.un.echo.id = getpid();
 		ft_memcpy(&packet.data, "zboub", 6);
 	}
-	packet.header.un.echo.sequence++;  //TODO: reverse endianess?
+	packet.header.un.echo.sequence++;
 	gettimeofday(&packet.timestamp, NULL);
 	packet.header.checksum = 0;
 	packet.header.checksum = checksum((t_word *)&packet, sizeof(packet));
@@ -145,5 +154,6 @@ int						send_packet(void)
 		printf("Wrote %zd/%zu bytes\n", bwrote, sizeof(packet)); /* DEBUG */
 	}
 
+	g_env.stats.n_sent++;
 	return (EXIT_SUCCESS);
 }
