@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 19:49:14 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/31 00:36:14 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ int						ping(t_byte flags)
 		))
 		error(INET_NTOP, NULL);
 
+	gettimeofday(&g_env.start_time, NULL);
 	sig_init(SEC_TO_USEC(1.)); //TODO
 	printf("PING %s (%s) %d(%d) bytes of data.\n",
 		   g_env.host, g_env.addr_str, 56, 84); //TODO

@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:12:13 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 19:05:07 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 23:50:25 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,6 @@
 
 #include "ft_ping.h"
 
-
-/*
-** The  bzero()  function sets the first n bytes of the area starting at s
-** to zero (bytes containing '\0').
-*/
-void			ft_bzero(void *s, size_t n)
-{
-	char *swap;
-
-	if (n)
-	{
-		swap = s;
-		while (n--)
-			*swap++ = 0;
-	}
-}
 
 /*
 ** The  memcpy()  function  copies  n bytes from memory area src to memory
@@ -73,4 +57,14 @@ int				ft_memcmp(const void *s1, const void *s2, size_t n)
 		}
 	}
 	return (0);
+}
+
+
+/*
+** return the difference in miliseconds from 'since' to 'now'
+*/
+double			time_diff(struct timeval *since, struct timeval *now)
+{
+	return (double)(now->tv_sec - since->tv_sec) * 1000. \
+		+ (double)(now->tv_usec - since->tv_usec) / 1000.;
 }

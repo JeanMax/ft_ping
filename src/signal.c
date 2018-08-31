@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 20:14:24 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/31 00:01:01 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,19 @@
 
 static void		interupt_handler(int i)
 {
-	double avg = (double)g_env.stats.trip_time_sum / (double)g_env.stats.n_received;
+	struct timeval	now;
+	double			avg = (double)g_env.stats.trip_time_sum
+		/ (double)g_env.stats.n_received;
 
 	(void)i;
+	gettimeofday(&now, NULL);
 	printf("\n--- %s ping statistics ---\n"
 		   "%u packets transmitted, %u received, %.3g%% packet loss, time %ums\n"
 		   "rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3Lf ms\n",
 		   g_env.host,
 		   g_env.stats.n_sent, g_env.stats.n_received,
 		   100 - (double)(g_env.stats.n_received / g_env.stats.n_sent) * 100.,
-		   (t_dword)g_env.stats.trip_time_sum, //TODO: this is wrong
+		   (t_dword)time_diff(&g_env.start_time, &now),
 		   g_env.stats.min_trip_time,
 		   avg,
 		   g_env.stats.max_trip_time,

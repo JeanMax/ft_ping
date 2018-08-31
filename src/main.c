@@ -6,13 +6,13 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 19:58:57 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/31 00:36:03 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
-t_env g_env	= {{0}, {0}, NULL, -1, {0}};
+t_env g_env	= {{0}, {0}, NULL, -1, {0}, {0}};
 
 
 static t_bool			parse_flags(char *s, t_byte *flags)
@@ -43,9 +43,8 @@ static char				*parse_av(char **av, t_byte *flags)
 
 int						main(int ac, char **av)
 {
-	t_byte	flags;
+	t_byte	flags = NO_FLAG;
 
-	flags = NO_FLAG;
 	if (ac < 2 || ac > 4 || !(g_env.host = parse_av(av + 1, &flags)))
 		error(USAGE, *av);
 

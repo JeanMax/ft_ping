@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 19:57:43 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/30 23:55:57 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,7 @@ enum	e_error
 {
 	USAGE,
 	ROOT,
-	MALLOC,
 	INET_NTOP,
-	INET_PTON,
 	ADDRINFO,
 	SOCKET,
 	IPV6
@@ -152,6 +150,7 @@ struct		s_env
 	char				*host;
 	int					sock;
 	t_packet_stats		stats;
+	struct timeval		start_time;
 };
 
 /*
@@ -172,9 +171,9 @@ void					sig_init(t_dword usec_interval);
 /*
 **	-util.c
 */
-void					ft_bzero(void *s, size_t n);
 void					*ft_memcpy(void *dest, const void *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
+double					time_diff(struct timeval *since, struct timeval *now);
 
 /*
 **	-ping.c

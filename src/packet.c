@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 20:00:01 by mc               ###   ########.fr       */
+/*   Updated: 2018/08/31 00:04:26 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,15 @@ static t_word			checksum(t_word *buffer, int size)
 	return (t_word)(~cksum);
 }
 
-static double			get_packet_trip_time(struct timeval *since, struct timeval *now)
-{
-	return (double)(now->tv_sec - since->tv_sec) * 1000. \
-		+ (double)(now->tv_usec - since->tv_usec) / 1000.;
-}
-
 static int				validate_msg(t_byte *msg)
 {
     struct iphdr	*ip = NULL;
     struct icmphdr	*icmp = NULL;
 	t_word			check;
-	struct timeval	timestamp;
+	struct timeval	now;
 	double			trip_time;
 
-	gettimeofday(&timestamp, NULL);
+	gettimeofday(&now, NULL);
     ip = (struct iphdr *)msg;
     icmp = (struct icmphdr *)(msg + ip->ihl * sizeof(t_dword));
 
@@ -83,16 +77,16 @@ static int				validate_msg(t_byte *msg)
         return (EXIT_FAILURE);
 	}
 
-	trip_time = get_packet_trip_time(
+	trip_time = time_diff(
 		(struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)),
-		&timestamp);
+		&now);
 	g_env.stats.n_received++;
 	g_env.stats.trip_time_sum += (long double)trip_time;
 	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
 	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
 	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
 
-	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.2f ms\n",
+	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
 		   sizeof(t_packet), g_env.addr_str,
 		   icmp->un.echo.sequence, ip->ttl,
 		   trip_time);
