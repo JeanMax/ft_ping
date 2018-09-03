@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 22:03:30 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 22:49:39 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,8 +168,9 @@ struct		s_options
 	char				*host;
 	t_byte				flags;
 	int					ttl;
+	int					npackets;
 	int					interval; //ms
-	int					deadline; //sec
+	int					deadline; //ms
 };
 
 
@@ -213,7 +214,7 @@ int						ft_atoi(char *str);
 /*
 **	-ping.c
 */
-int						ping(t_byte flags);
+int						ping();
 
 /*
 ** -socket.c

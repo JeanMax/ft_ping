@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 21:46:58 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 22:49:28 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static void		interupt_handler(int i)
 		   "rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3Lf ms\n",
 		   g_env.opt.host,
 		   g_env.stats.n_sent, g_env.stats.n_received,
-		   100 - (double)(g_env.stats.n_received / g_env.stats.n_sent) * 100.,
+		   100 - (double)g_env.stats.n_received / (double)g_env.stats.n_sent * 100.,
 		   (t_dword)time_diff(&g_env.start_time, &now),
 		   g_env.stats.min_trip_time,
 		   avg,
@@ -45,7 +45,18 @@ static void		interupt_handler(int i)
 
 static void		alarm_handler(int i)
 {
+	struct timeval	now;
 	(void)i;
+
+	if ((g_env.opt.flags & FLAG_C)
+		&& g_env.stats.n_sent >= g_env.opt.npackets)
+		interupt_handler(42);
+
+	gettimeofday(&now, NULL);
+	if ((g_env.opt.flags & FLAG_W)
+		&& time_diff(&g_env.start_time, &now) >= g_env.opt.deadline)
+		interupt_handler(42);
+
 	send_packet();
 }
 
@@ -53,9 +64,11 @@ void			sig_init(t_dword usec_interval)
 {
 	struct itimerval t;
 
+	if (!usec_interval)
+		usec_interval = SEC_TO_USEC(1); // default to 1 sec
+
 	signal(SIGINT, interupt_handler);
 	signal(SIGALRM, alarm_handler);
-
 	t.it_value.tv_sec = (t_dword)USEC_TO_SEC(usec_interval);
 	t.it_value.tv_usec = usec_interval - SEC_TO_USEC(t.it_value.tv_sec);
 	t.it_interval = t.it_value;

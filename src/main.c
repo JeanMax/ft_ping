@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 22:03:40 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 23:04:25 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 	//TODO: -[tcwifDO]
 	if (!*s)
 		return (TRUE);
-	if (*s == 'h')
+	if (*s == 'h' || *(s + 1))
 		return (FALSE);
 
 	if (*s == 'v')
@@ -35,16 +35,22 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 		return (TRUE);
 	}
 
-	if (*s == 'c')
-	{
-		*flags |= FLAG_C;
-		return (TRUE);
-	}
-
 	if (*s == 'f')
 	{
 		*flags |= FLAG_F;
 		return (TRUE);
+	}
+
+	if (*s == 'c')
+	{
+		*flags |= FLAG_C;
+		g_env.opt.npackets = ft_atoi(arg);
+		if (g_env.opt.npackets < 1)
+		{
+			fprintf(stderr, "bad number of packets to transmit.\n");
+			return (FALSE);
+		}
+		return (NEXT_ARG);
 	}
 
 	if (*s == 't')
@@ -62,7 +68,7 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 	if (*s == 'i')
 	{
 		*flags |= FLAG_I;
-		g_env.opt.interval = ft_atoi(arg);
+		g_env.opt.interval = ft_atoi(arg); //TODO: stod?
 		if (g_env.opt.interval < 1)
 		{
 			fprintf(stderr, "bad timing interval\n");
@@ -102,9 +108,7 @@ static char				*parse_av(char **av, t_byte *flags)
 
 int						main(int ac, char **av)
 {
-	t_byte	flags = NO_FLAG;
-
-	if (ac < 2 || ac > 4 || !(g_env.opt.host = parse_av(av + 1, &flags)))
+	if (ac < 2 || !(g_env.opt.host = parse_av(av + 1, &g_env.opt.flags)))
 		error(USAGE, *av);
 
 	if (getuid() != 0)
@@ -112,7 +116,7 @@ int						main(int ac, char **av)
 
 	g_env.stats.min_trip_time = 0xffff;
 
-	return (ping(flags));
+	return (ping());
     /* TODO: exit code */
 	/* If ping does not receive any reply packets at all it will exit with code 1.  */
 	/* If a packet count and deadline are both specified, and fewer than */
