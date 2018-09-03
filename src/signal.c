@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/31 00:01:01 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 21:46:58 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static void		interupt_handler(int i)
 	printf("\n--- %s ping statistics ---\n"
 		   "%u packets transmitted, %u received, %.3g%% packet loss, time %ums\n"
 		   "rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3Lf ms\n",
-		   g_env.host,
+		   g_env.opt.host,
 		   g_env.stats.n_sent, g_env.stats.n_received,
 		   100 - (double)(g_env.stats.n_received / g_env.stats.n_sent) * 100.,
 		   (t_dword)time_diff(&g_env.start_time, &now),

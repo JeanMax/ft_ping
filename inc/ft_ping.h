@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 23:55:57 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 22:03:30 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,22 @@
 
 typedef int				t_bool;
 
+
+/*
+** limits
+*/
+# ifndef INT_MAX
+#  define SHRT_MAX		32767
+#  define SHRT_MIN		(-SHRT_MAX - 1)
+#  define USHRT_MAX		(2 * SHRT_MAX + 1)
+#  define INT_MAX		2147483647
+#  define INT_MIN		(-INT_MAX - 1)
+#  define UINT_MAX		(2 * INT_MAX + 1)
+#  define LONG_MAX		9223372036854775807
+#  define LONG_MIN		(-LONG_MAX - 1)
+#  define ULONG_MAX		(2 * LONG_MAX + 1)
+# endif
+
 /*
 ** some types for memory handling
 */
@@ -60,17 +76,6 @@ typedef unsigned int	t_dword;
 */
 # define SEC_TO_USEC(x) (t_dword)((x) * 1e6)
 # define USEC_TO_SEC(x) ((double)(x) / 1e6)
-
-/*
-** command line flags
-*/
-# define NO_FLAG	0
-# define FLAG_V		1
-/*
-# define FLAG_H		2
-# define FLAG_Q		4
-# define FLAG_T		8
-*/
 
 /*
 ** error handling
@@ -139,6 +144,35 @@ struct		s_packet_stats
 	double				min_trip_time;
 };
 
+
+/*
+** command line flags
+*/
+# define NO_FLAG	0
+# define FLAG_V		(1 << 1)
+# define FLAG_Q		(1 << 2)
+# define FLAG_C		(1 << 3)
+# define FLAG_T		(1 << 4)
+# define FLAG_I		(1 << 5)
+# define FLAG_W		(1 << 6)
+# define FLAG_F		(1 << 7)
+
+# define NEXT_ARG	2
+
+/*
+** command line options struct
+*/
+typedef struct s_options	t_options;
+struct		s_options
+{
+	char				*host;
+	t_byte				flags;
+	int					ttl;
+	int					interval; //ms
+	int					deadline; //sec
+};
+
+
 /*
 ** env struct
 */
@@ -147,7 +181,7 @@ struct		s_env
 {
 	struct addrinfo		addr_info;
 	char				addr_str[INET6_ADDRSTRLEN];
-	char				*host;
+	t_options			opt;
 	int					sock;
 	t_packet_stats		stats;
 	struct timeval		start_time;
@@ -174,6 +208,7 @@ void					sig_init(t_dword usec_interval);
 void					*ft_memcpy(void *dest, const void *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
 double					time_diff(struct timeval *since, struct timeval *now);
+int						ft_atoi(char *str);
 
 /*
 **	-ping.c

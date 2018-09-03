@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2018/08/30 23:53:22 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 21:50:31 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,12 @@
 void			error(enum e_error e, char *msg)
 {
 	if (e == USAGE)
-		fprintf(stderr, "Usage: %s [-vh] destination\n", msg);
+		fprintf(stderr, "Usage: %s [-vqh]"
+				" [-c count]"
+				" [-t ttl]"
+				" [-i interval]"
+				" [-w deadline]"
+				" destination\n", msg);
 	else if (e == ROOT)
 		fprintf(stderr, "%s must be run with root privileges.\n", msg);
 	else if (e == INET_NTOP)

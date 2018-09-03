@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:12:13 by mc                #+#    #+#             */
-/*   Updated: 2018/08/30 23:50:25 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 21:47:48 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,59 @@ int				ft_memcmp(const void *s1, const void *s2, size_t n)
 		}
 	}
 	return (0);
+}
+
+
+/*
+** checks for white-space  characters.   In  the  "C"  and  "POSIX"
+** locales,  these  are:  space,  form-feed ('\f'), newline ('\n'),
+** carriage return ('\r'), horizontal tab ('\t'), and vertical  tab
+** ('\v').
+*/
+static int		ft_isspace(int c)
+{
+	if (c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
+			|| c == ' ')
+		return (TRUE);
+	return (FALSE);
+}
+
+/*
+** checks for a digit (0 through 9).
+*/
+static int		ft_isdigit(int i)
+{
+	if (i >= '0' && i <= '9')
+		return (TRUE);
+	return (FALSE);
+}
+
+/*
+** The atoi() function converts the initial portion of the string  pointed
+** to by nptr to int.
+** If the string cannot be converted into a number, atoi returns 0.
+** If the string represents a numeric value greater/lower than INT_MAX/MIN,
+** INT_MAX/MIN will be returned
+*/
+int				ft_atoi(char *str)
+{
+	t_bool	negative;
+	long	ret;
+
+	while (ft_isspace(*str))
+		str++;
+	negative = *str == '-' ? TRUE : FALSE;
+	if (*str == '-' || *str == '+')
+		str++;
+	while (*str && *str == '0')
+		str++;
+	ret = 0;
+	while (*str && ft_isdigit(*str) && ret < INT_MAX)
+		ret = ret * 10 + *(str++) - '0';
+	if (negative)
+		return (ret > INT_MAX ? INT_MIN : (int)-ret);
+	else
+		return (ret > INT_MAX ? INT_MAX : (int)ret);
 }
 
 
