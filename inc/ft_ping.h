@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 22:49:39 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 00:01:08 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ enum	e_error
 /*
 ** optional debug statements
 */
-/* # define ANNOYING_DEBUG */
+# define ANNOYING_DEBUG
 # ifdef ANNOYING_DEBUG
 #  include <stdio.h>
 #  define DEBUG_HEADER CLR_MAGENTA "[DEBUG] " CLR_RESET
@@ -214,7 +214,7 @@ int						ft_atoi(char *str);
 /*
 **	-ping.c
 */
-int						ping();
+int						ping(void);
 
 /*
 ** -socket.c

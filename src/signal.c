@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 22:49:28 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 23:54:15 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ static void		interupt_handler(int i)
 			   - (long double)avg * (long double)avg
 			   )
 		);
+	//TODO: stats are buggy in edge cases
 
 	exit(EXIT_SUCCESS);
 }

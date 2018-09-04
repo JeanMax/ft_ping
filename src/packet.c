@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/08/31 00:04:26 by root             ###   ########.fr       */
+/*   Updated: 2018/09/04 00:19:48 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static t_word			checksum(t_word *buffer, int size)
 	return (t_word)(~cksum);
 }
 
-static int				validate_msg(t_byte *msg)
+static int				validate_msg(t_byte *msg, ssize_t msg_len)
 {
     struct iphdr	*ip = NULL;
     struct icmphdr	*icmp = NULL;
@@ -48,11 +48,24 @@ static int				validate_msg(t_byte *msg)
     ip = (struct iphdr *)msg;
     icmp = (struct icmphdr *)(msg + ip->ihl * sizeof(t_dword));
 
+	if (icmp->type == ICMP_TIME_EXCEEDED)
+	{
+		printf("%zu bytes from %s: icmp_seq=%d Time to live exceeded\n",
+			   sizeof(t_packet), g_env.addr_str,
+			   icmp->un.echo.sequence);
+        return (EXIT_FAILURE);
+	}
     if (icmp->type != ICMP_ECHOREPLY)
     {
         DEBUGF("nonecho type %hhu recvd\n", icmp->type); /* DEBUG */
         return (EXIT_FAILURE);
     }
+
+	if (msg_len != sizeof(t_packet))
+	{
+        DEBUGF("incomplete packet"); /* DEBUG */
+        return (EXIT_FAILURE);
+	}
 
     if (icmp->un.echo.id != getpid())
     {
@@ -85,6 +98,7 @@ static int				validate_msg(t_byte *msg)
 	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
 	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
 	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
+	//TODO: count errors
 
 	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
 		   sizeof(t_packet), g_env.addr_str,
@@ -108,14 +122,14 @@ int						recv_packet(void)
 	iov.iov_base = &iov_base;
 	iov.iov_len = IOV_BUF_SIZE;
 
-	ret = recvmsg(g_env.sock, &msg, 0);
-	if (ret	< 0 || ret != sizeof(t_packet))
+	ret = recvmsg(g_env.sock, &msg, MSG_WAITALL);
+	if (ret	< 0)
 	{
-		perror("recv");			/* DEBUG */
+		/* perror("recv");			/\* DEBUG *\/ */
 		return (EXIT_FAILURE);
 	}
 
-	return (validate_msg(iov_base));
+	return (validate_msg(iov_base, ret));
 }
 
 int						send_packet(void)

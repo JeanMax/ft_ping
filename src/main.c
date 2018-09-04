@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 23:04:25 by root             ###   ########.fr       */
+/*   Updated: 2018/09/03 23:07:30 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,25 +17,25 @@ t_env g_env	= {{0}, {0}, {0}, -1, {0}, {0}};
 
 static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 {
-	//TODO: -[tcwifDO]
+	//TODO: -[DO] ?
 	if (!*s)
 		return (TRUE);
 	if (*s == 'h' || *(s + 1))
 		return (FALSE);
 
-	if (*s == 'v')
+	if (*s == 'v') //TODO
 	{
 		*flags |= FLAG_V;
 		return (TRUE);
 	}
 
-	if (*s == 'q')
+	if (*s == 'q') //TODO
 	{
 		*flags |= FLAG_Q;
 		return (TRUE);
 	}
 
-	if (*s == 'f')
+	if (*s == 'f') //TODO
 	{
 		*flags |= FLAG_F;
 		return (TRUE);
@@ -53,7 +53,7 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 		return (NEXT_ARG);
 	}
 
-	if (*s == 't')
+	if (*s == 't') //TODO
 	{
 		*flags |= FLAG_T;
 		g_env.opt.ttl = ft_atoi(arg);

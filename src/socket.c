@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:27:55 by mc                #+#    #+#             */
-/*   Updated: 2018/09/03 21:46:48 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/03 23:40:36 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,19 @@ int						get_sock(void)
 
 	sock = socks_loop(result);
 
-	freeaddrinfo(result);
+	// setting timeout of recv setting
+	/* struct timeval tv_out; */
+    /* tv_out.tv_sec = RECV_TIMEOUT; */
+    /* tv_out.tv_usec = 0; */
+    /* setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, */
+	/* 		   (const char*)&tv_out, sizeof tv_out); */
+
+
+	if (g_env.opt.flags & FLAG_T)
+		setsockopt(sock, SOL_IP, IP_TTL,
+				   &g_env.opt.ttl, sizeof(g_env.opt.ttl));
+
+
+	freeaddrinfo(result); //TODO: this is freeing the ip_addr field :/
 	return (sock);
 }
