@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 15:46:46 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:52:45 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 
 	if (icmp->type == ICMP_TIME_EXCEEDED || g_env.stats.n_errors)
 	{
-		printf("%zu bytes from %s: icmp_seq=%d Time to live exceeded\n",
-			   sizeof(t_packet), g_env.addr_str,
-			   g_env.stats.n_sent);
-		fflush(stdout);
+		if (!(g_env.opt.flags & FLAG_Q))
+			printf("%zu bytes from %s: icmp_seq=%d Time to live exceeded\n",
+				   sizeof(t_packet), g_env.addr_str,
+				   g_env.stats.n_sent);
 		g_env.stats.n_errors++;
         return (EXIT_FAILURE);
 	}
@@ -101,11 +101,11 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
 	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
 
-	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
-		   sizeof(t_packet), g_env.addr_str,
-		   icmp->un.echo.sequence, ip->ttl,
-		   trip_time);
-	fflush(stdout);
+	if (!(g_env.opt.flags & FLAG_Q))
+		printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
+			   sizeof(t_packet), g_env.addr_str,
+			   icmp->un.echo.sequence, ip->ttl,
+			   trip_time);
 
     return (EXIT_SUCCESS);
 }

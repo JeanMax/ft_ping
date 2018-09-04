@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/04 15:46:55 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:51:58 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static t_bool			parse_flags(char *s, char *arg)
 		return (TRUE);
 	}
 
-	if (*s == 'q') //TODO
+	if (*s == 'q')
 	{
 		g_env.opt.flags |= FLAG_Q;
 		return (TRUE);
