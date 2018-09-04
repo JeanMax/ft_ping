@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 23:04:25 by root             ###   ########.fr       */
+/*   Updated: 2018/09/04 15:46:55 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,37 +15,37 @@
 t_env g_env	= {{0}, {0}, {0}, -1, {0}, {0}};
 
 
-static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
+static t_bool			parse_flags(char *s, char *arg)
 {
-	//TODO: -[tcwifDO]
+	//TODO: -[DO] ?
 	if (!*s)
 		return (TRUE);
 	if (*s == 'h' || *(s + 1))
 		return (FALSE);
 
-	if (*s == 'v')
+	if (*s == 'v') //TODO
 	{
-		*flags |= FLAG_V;
+		g_env.opt.flags |= FLAG_V;
 		return (TRUE);
 	}
 
-	if (*s == 'q')
+	if (*s == 'q') //TODO
 	{
-		*flags |= FLAG_Q;
+		g_env.opt.flags |= FLAG_Q;
 		return (TRUE);
 	}
 
-	if (*s == 'f')
+	if (*s == 'f') //TODO
 	{
-		*flags |= FLAG_F;
+		g_env.opt.flags |= FLAG_F;
 		return (TRUE);
 	}
 
 	if (*s == 'c')
 	{
-		*flags |= FLAG_C;
-		g_env.opt.npackets = ft_atoi(arg);
-		if (g_env.opt.npackets < 1)
+		g_env.opt.flags |= FLAG_C;
+		g_env.opt.n_packets = ft_atoi(arg);
+		if (g_env.opt.n_packets < 1 || g_env.opt.n_packets > INT_MAX / 2)
 		{
 			fprintf(stderr, "bad number of packets to transmit.\n");
 			return (FALSE);
@@ -55,7 +55,7 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 
 	if (*s == 't')
 	{
-		*flags |= FLAG_T;
+		g_env.opt.flags |= FLAG_T;
 		g_env.opt.ttl = ft_atoi(arg);
 		if (g_env.opt.ttl < 0 || g_env.opt.ttl > 255)
 		{
@@ -67,9 +67,9 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 
 	if (*s == 'i')
 	{
-		*flags |= FLAG_I;
-		g_env.opt.interval = ft_atoi(arg); //TODO: stod?
-		if (g_env.opt.interval < 1)
+		g_env.opt.flags |= FLAG_I;
+		g_env.opt.interval = ft_atoi(arg);
+		if (g_env.opt.interval < 1 || g_env.opt.interval > INT_MAX / 2)
 		{
 			fprintf(stderr, "bad timing interval\n");
 			return (FALSE);
@@ -79,9 +79,9 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 
 	if (*s == 'w')
 	{
-		*flags |= FLAG_W;
+		g_env.opt.flags |= FLAG_W;
 		g_env.opt.deadline = ft_atoi(arg);
-		if (g_env.opt.deadline < 0)
+		if (g_env.opt.deadline < 0 || g_env.opt.deadline > INT_MAX / 2)
 		{
 			fprintf(stderr, "bad wait time\n");
 			return (FALSE);
@@ -93,22 +93,22 @@ static t_bool			parse_flags(char *s, char *arg, t_byte *flags)
 	return (FALSE);
 }
 
-static char				*parse_av(char **av, t_byte *flags)
+static char				*parse_av(char **av)
 {
 	t_bool	ret;
 
 	if (!*av || **av != '-')
 		return (*av && *(av + 1) ? NULL : *av);
 
-	if (!(ret = parse_flags(*av + 1, *(av + 1), flags)))
+	if (!(ret = parse_flags(*av + 1, *(av + 1))))
 		return (NULL);
 
-	return (parse_av(av + ret, flags));
+	return (parse_av(av + ret));
 }
 
 int						main(int ac, char **av)
 {
-	if (ac < 2 || !(g_env.opt.host = parse_av(av + 1, &g_env.opt.flags)))
+	if (ac < 2 || !(g_env.opt.host = parse_av(av + 1)))
 		error(USAGE, *av);
 
 	if (getuid() != 0)

@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:12:13 by mc                #+#    #+#             */
-/*   Updated: 2018/09/03 21:47:48 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 14:59:00 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,10 +114,14 @@ int				ft_atoi(char *str)
 
 
 /*
-** return the difference in miliseconds from 'since' to 'now'
+** return the difference in microseconds from 'since' to 'now'
 */
-double			time_diff(struct timeval *since, struct timeval *now)
+t_dword			time_diff(struct timeval *since, struct timeval *now)
 {
-	return (double)(now->tv_sec - since->tv_sec) * 1000. \
-		+ (double)(now->tv_usec - since->tv_usec) / 1000.;
+	if (now->tv_usec > since->tv_usec)
+		return (now->tv_sec - since->tv_sec) * (t_dword)1e6
+			+ (now->tv_usec - since->tv_usec);
+
+	return (now->tv_sec - since->tv_sec - 1) * (t_dword)1e6
+		+ (now->tv_usec - since->tv_usec + (t_dword)1e6);
 }

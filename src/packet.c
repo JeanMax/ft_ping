@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/08/31 00:04:26 by root             ###   ########.fr       */
+/*   Updated: 2018/09/04 15:46:46 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,23 +36,39 @@ static t_word			checksum(t_word *buffer, int size)
 	return (t_word)(~cksum);
 }
 
-static int				validate_msg(t_byte *msg)
+static int				validate_msg(t_byte *msg, ssize_t msg_len)
 {
     struct iphdr	*ip = NULL;
     struct icmphdr	*icmp = NULL;
 	t_word			check;
 	struct timeval	now;
+	struct timeval	*since;
 	double			trip_time;
 
 	gettimeofday(&now, NULL);
     ip = (struct iphdr *)msg;
     icmp = (struct icmphdr *)(msg + ip->ihl * sizeof(t_dword));
 
+	if (icmp->type == ICMP_TIME_EXCEEDED || g_env.stats.n_errors)
+	{
+		printf("%zu bytes from %s: icmp_seq=%d Time to live exceeded\n",
+			   sizeof(t_packet), g_env.addr_str,
+			   g_env.stats.n_sent);
+		fflush(stdout);
+		g_env.stats.n_errors++;
+        return (EXIT_FAILURE);
+	}
     if (icmp->type != ICMP_ECHOREPLY)
     {
         DEBUGF("nonecho type %hhu recvd\n", icmp->type); /* DEBUG */
         return (EXIT_FAILURE);
     }
+
+	if (msg_len != sizeof(t_packet))
+	{
+        DEBUGF("incomplete packet"); /* DEBUG */
+        return (EXIT_FAILURE);
+	}
 
     if (icmp->un.echo.id != getpid())
     {
@@ -77,9 +93,8 @@ static int				validate_msg(t_byte *msg)
         return (EXIT_FAILURE);
 	}
 
-	trip_time = time_diff(
-		(struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)),
-		&now);
+	since = (struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr));
+	trip_time = (double)time_diff(since, &now) / 1000;
 	g_env.stats.n_received++;
 	g_env.stats.trip_time_sum += (long double)trip_time;
 	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
@@ -90,6 +105,7 @@ static int				validate_msg(t_byte *msg)
 		   sizeof(t_packet), g_env.addr_str,
 		   icmp->un.echo.sequence, ip->ttl,
 		   trip_time);
+	fflush(stdout);
 
     return (EXIT_SUCCESS);
 }
@@ -108,14 +124,14 @@ int						recv_packet(void)
 	iov.iov_base = &iov_base;
 	iov.iov_len = IOV_BUF_SIZE;
 
-	ret = recvmsg(g_env.sock, &msg, 0);
-	if (ret	< 0 || ret != sizeof(t_packet))
+	ret = recvmsg(g_env.sock, &msg, MSG_DONTWAIT);
+	if (ret	< 0)
 	{
-		perror("recv");			/* DEBUG */
+		/* perror("recv");			/\* DEBUG *\/ */
 		return (EXIT_FAILURE);
 	}
 
-	return (validate_msg(iov_base));
+	return (validate_msg(iov_base, ret));
 }
 
 int						send_packet(void)
@@ -126,7 +142,7 @@ int						send_packet(void)
 	if (!packet.header.type)
 	{
 		packet.header.type = ICMP_ECHO;
-		packet.header.un.echo.id = getpid();
+		packet.header.un.echo.id = (t_word)getpid();
 		ft_memcpy(&packet.data, "zboub", 6);
 	}
 	packet.header.un.echo.sequence++;

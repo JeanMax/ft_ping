@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 22:49:39 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:34:31 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ enum	e_error
 /*
 ** optional debug statements
 */
-/* # define ANNOYING_DEBUG */
+# define ANNOYING_DEBUG
 # ifdef ANNOYING_DEBUG
 #  include <stdio.h>
 #  define DEBUG_HEADER CLR_MAGENTA "[DEBUG] " CLR_RESET
@@ -119,13 +119,13 @@ enum	e_error
 /*
 ** packet struct
 */
-#define PACKET_SIZE  40
+#define PACKET_DATA_SIZE  40
 typedef struct s_packet	t_packet;
 struct		s_packet
 {
 	struct icmphdr		header;
 	struct timeval		timestamp;
-	t_byte				data[PACKET_SIZE];
+	t_byte				data[PACKET_DATA_SIZE];
 };
 
 # define IOV_BUF_SIZE (sizeof(t_packet))
@@ -142,6 +142,7 @@ struct		s_packet_stats
 	long double			trip_time_sum_squared;
 	double				max_trip_time;
 	double				min_trip_time;
+	t_word				n_errors;
 };
 
 
@@ -166,9 +167,9 @@ typedef struct s_options	t_options;
 struct		s_options
 {
 	char				*host;
-	t_byte				flags;
+	t_dword				flags;
 	int					ttl;
-	int					npackets;
+	int					n_packets;
 	int					interval; //ms
 	int					deadline; //ms
 };
@@ -208,13 +209,13 @@ void					sig_init(t_dword usec_interval);
 */
 void					*ft_memcpy(void *dest, const void *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
-double					time_diff(struct timeval *since, struct timeval *now);
+t_dword					time_diff(struct timeval *since, struct timeval *now);
 int						ft_atoi(char *str);
 
 /*
 **	-ping.c
 */
-int						ping();
+int						ping(void);
 
 /*
 ** -socket.c
