@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:27:55 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 14:22:27 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:21:07 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int						get_sock(void)
 
 
 	if (g_env.opt.flags & FLAG_T)
-		setsockopt(sock, SOL_IP, IP_TTL,
+		setsockopt(sock, IPPROTO_IP, IP_TTL,
 				   &g_env.opt.ttl, sizeof(g_env.opt.ttl));
 
 	/* freeaddrinfo(result); // not allowed :/ */

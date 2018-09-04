@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/04 14:39:38 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:34:31 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ struct		s_packet_stats
 	long double			trip_time_sum_squared;
 	double				max_trip_time;
 	double				min_trip_time;
+	t_word				n_errors;
 };
 
 

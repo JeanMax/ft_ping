@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 15:06:10 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:46:46 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,13 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
     ip = (struct iphdr *)msg;
     icmp = (struct icmphdr *)(msg + ip->ihl * sizeof(t_dword));
 
-	if (icmp->type == ICMP_TIME_EXCEEDED)
+	if (icmp->type == ICMP_TIME_EXCEEDED || g_env.stats.n_errors)
 	{
 		printf("%zu bytes from %s: icmp_seq=%d Time to live exceeded\n",
 			   sizeof(t_packet), g_env.addr_str,
-			   icmp->un.echo.sequence);
+			   g_env.stats.n_sent);
+		fflush(stdout);
+		g_env.stats.n_errors++;
         return (EXIT_FAILURE);
 	}
     if (icmp->type != ICMP_ECHOREPLY)
@@ -98,12 +100,12 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
 	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
 	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
-	//TODO: count errors
 
 	printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
 		   sizeof(t_packet), g_env.addr_str,
 		   icmp->un.echo.sequence, ip->ttl,
 		   trip_time);
+	fflush(stdout);
 
     return (EXIT_SUCCESS);
 }
@@ -122,7 +124,7 @@ int						recv_packet(void)
 	iov.iov_base = &iov_base;
 	iov.iov_len = IOV_BUF_SIZE;
 
-	ret = recvmsg(g_env.sock, &msg, MSG_WAITALL);
+	ret = recvmsg(g_env.sock, &msg, MSG_DONTWAIT);
 	if (ret	< 0)
 	{
 		/* perror("recv");			/\* DEBUG *\/ */
