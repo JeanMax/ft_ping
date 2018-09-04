@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 23:54:15 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:00:25 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static void		interupt_handler(int i)
 		   g_env.opt.host,
 		   g_env.stats.n_sent, g_env.stats.n_received,
 		   100 - (double)g_env.stats.n_received / (double)g_env.stats.n_sent * 100.,
-		   (t_dword)time_diff(&g_env.start_time, &now),
+		   time_diff(&g_env.start_time, &now) / 1000,
 		   g_env.stats.min_trip_time,
 		   avg,
 		   g_env.stats.max_trip_time,
@@ -50,12 +50,12 @@ static void		alarm_handler(int i)
 	(void)i;
 
 	if ((g_env.opt.flags & FLAG_C)
-		&& g_env.stats.n_sent >= g_env.opt.npackets)
+		&& g_env.stats.n_sent >= g_env.opt.n_packets)
 		interupt_handler(42);
 
 	gettimeofday(&now, NULL);
 	if ((g_env.opt.flags & FLAG_W)
-		&& time_diff(&g_env.start_time, &now) >= g_env.opt.deadline)
+		&& time_diff(&g_env.start_time, &now) / 1000 >= (t_dword)g_env.opt.deadline)
 		interupt_handler(42);
 
 	send_packet();

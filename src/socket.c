@@ -6,10 +6,9 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:27:55 by mc                #+#    #+#             */
-/*   Updated: 2018/09/03 23:40:36 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 14:22:27 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "ft_ping.h"
 
@@ -55,7 +54,6 @@ int						get_sock(void)
 		setsockopt(sock, SOL_IP, IP_TTL,
 				   &g_env.opt.ttl, sizeof(g_env.opt.ttl));
 
-
-	freeaddrinfo(result); //TODO: this is freeing the ip_addr field :/
+	/* freeaddrinfo(result); // not allowed :/ */
 	return (sock);
 }

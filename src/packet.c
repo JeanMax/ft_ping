@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 00:19:48 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/04 15:06:10 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
     struct icmphdr	*icmp = NULL;
 	t_word			check;
 	struct timeval	now;
+	struct timeval	*since;
 	double			trip_time;
 
 	gettimeofday(&now, NULL);
@@ -90,9 +91,8 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
         return (EXIT_FAILURE);
 	}
 
-	trip_time = time_diff(
-		(struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr)),
-		&now);
+	since = (struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr));
+	trip_time = (double)time_diff(since, &now) / 1000;
 	g_env.stats.n_received++;
 	g_env.stats.trip_time_sum += (long double)trip_time;
 	g_env.stats.trip_time_sum_squared += (long double)(trip_time * trip_time);
@@ -140,7 +140,7 @@ int						send_packet(void)
 	if (!packet.header.type)
 	{
 		packet.header.type = ICMP_ECHO;
-		packet.header.un.echo.id = getpid();
+		packet.header.un.echo.id = (t_word)getpid();
 		ft_memcpy(&packet.data, "zboub", 6);
 	}
 	packet.header.un.echo.sequence++;
