@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/06 00:41:46 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:05:39 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,16 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	g_env.stats.max_trip_time = (double)MAX(g_env.stats.max_trip_time, trip_time);
 	g_env.stats.min_trip_time = (double)MIN(g_env.stats.min_trip_time, trip_time);
 
+
 	if (!(g_env.opt.flags & FLAG_Q))
+	{
+		if ((g_env.opt.flags & FLAG_D))
+			printf("[%lu.%lu] ", now.tv_sec, now.tv_usec);
 		printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
 			   sizeof(t_packet), g_env.addr_str,
 			   icmp->un.echo.sequence, ip->ttl,
 			   trip_time);
+	}
 
 	if (g_env.opt.flags & FLAG_F)
 		putchar('\b');

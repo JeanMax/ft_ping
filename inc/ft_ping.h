@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/04 15:34:31 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:04:25 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,7 @@ struct		s_packet_stats
 # define FLAG_I		(1 << 5)
 # define FLAG_W		(1 << 6)
 # define FLAG_F		(1 << 7)
+# define FLAG_D		(1 << 8)
 
 # define NEXT_ARG	2
 

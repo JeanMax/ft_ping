@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 00:40:45 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:07:28 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ t_env g_env	= {{0}, {0}, {0}, -1, {0}, {0}};
 
 static t_bool			parse_flags(char *s, char *arg)
 {
-	//TODO: -[DO] ?
 	if (!*s)
 		return (TRUE);
 	if (*s == 'h' || *(s + 1))
@@ -35,10 +34,9 @@ static t_bool			parse_flags(char *s, char *arg)
 		return (TRUE);
 	}
 
-	if (*s == 'f') //TODO
+	if (*s == 'D')
 	{
-		g_env.opt.interval = 15;
-		g_env.opt.flags |= (FLAG_F | FLAG_Q);
+		g_env.opt.flags |= FLAG_D;
 		return (TRUE);
 	}
 
@@ -76,6 +74,15 @@ static t_bool			parse_flags(char *s, char *arg)
 			return (FALSE);
 		}
 		return (NEXT_ARG);
+	}
+
+
+	if (*s == 'f')
+	{
+		if (!(g_env.opt.flags & FLAG_I))
+			g_env.opt.interval = 15;
+		g_env.opt.flags |= (FLAG_F | FLAG_Q);
+		return (TRUE);
 	}
 
 	if (*s == 'w')
