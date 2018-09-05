@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/04 15:40:35 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 00:45:53 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void		interupt_handler(int i)
 	if (g_env.stats.n_errors)
 		printf("+%d errors, ", g_env.stats.n_errors);
 
-	printf("%.3g%% packet loss, time %ums\n",
+	printf("%.5g%% packet loss, time %ums\n",
 		   100 - (double)g_env.stats.n_received / (double)g_env.stats.n_sent * 100.,
 		   time_diff(&g_env.start_time, &now) / 1000
 		);

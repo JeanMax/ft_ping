@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/03 21:50:31 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 00:47:04 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 void			error(enum e_error e, char *msg)
 {
 	if (e == USAGE)
-		fprintf(stderr, "Usage: %s [-vqh]"
+		fprintf(stderr, "Usage: %s [-fhqv]"
 				" [-c count]"
-				" [-t ttl]"
 				" [-i interval]"
+				" [-t ttl]"
 				" [-w deadline]"
 				" destination\n", msg);
 	else if (e == ROOT)

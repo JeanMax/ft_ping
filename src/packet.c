@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 15:52:45 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 00:41:46 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,9 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 			   icmp->un.echo.sequence, ip->ttl,
 			   trip_time);
 
+	if (g_env.opt.flags & FLAG_F)
+		putchar('\b');
+
     return (EXIT_SUCCESS);
 }
 
@@ -164,6 +167,8 @@ int						send_packet(void)
 		printf("Wrote %zd/%zu bytes\n", bwrote, sizeof(packet)); /* DEBUG */
 	}
 
+	if (g_env.opt.flags & FLAG_F)
+		putchar('.');
 	g_env.stats.n_sent++;
 	return (EXIT_SUCCESS);
 }

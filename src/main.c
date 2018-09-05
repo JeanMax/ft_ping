@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/04 15:51:58 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 00:40:45 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ static t_bool			parse_flags(char *s, char *arg)
 
 	if (*s == 'f') //TODO
 	{
-		g_env.opt.flags |= FLAG_F;
+		g_env.opt.interval = 15;
+		g_env.opt.flags |= (FLAG_F | FLAG_Q);
 		return (TRUE);
 	}
 
@@ -124,4 +125,6 @@ int						main(int ac, char **av)
 	/* also exit with code 1. On other error it exits with code 2. Otherwise */
 	/* it exits with code 0. This makes it possible to use the exit code to see */
 	/* if a host is alive or not. */
+
+	//TODO: remove DEBUG
 }
