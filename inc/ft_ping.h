@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:04:25 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:32:35 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,15 @@
 # include <netdb.h>
 # include <math.h>
 
+/* If ping does not receive any reply packets at all it will exit with code 1.  */
+/* If a packet count and deadline are both specified, and fewer than */
+/* count packets are received by the time the deadline has arrived, it will */
+/* also exit with code 1. On other error it exits with code 2. Otherwise */
+/* it exits with code 0. This makes it possible to use the exit code to see */
+/* if a host is alive or not. */
+# define PING_SUCCESS	0
+# define PING_FAILURE	1
+# define PING_ERROR		2
 
 /*
 ** bool handling
@@ -172,7 +181,7 @@ struct		s_options
 	int					ttl;
 	int					n_packets;
 	int					interval; //ms
-	int					deadline; //ms
+	int					deadline; //s
 };
 
 
@@ -204,6 +213,8 @@ void					error(enum e_error e, char *msg);
 **	-signal.c
 */
 void					sig_init(t_dword usec_interval);
+void					interupt_handler(int i);
+
 
 /*
 **	-util.c

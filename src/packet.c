@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/06 01:05:39 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:35:09 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,25 +56,25 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 				   sizeof(t_packet), g_env.addr_str,
 				   g_env.stats.n_sent);
 		g_env.stats.n_errors++;
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
 	}
     if (icmp->type != ICMP_ECHOREPLY)
     {
         DEBUGF("nonecho type %hhu recvd\n", icmp->type); /* DEBUG */
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
     }
 
 	if (msg_len != sizeof(t_packet))
 	{
         DEBUGF("incomplete packet"); /* DEBUG */
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
 	}
 
     if (icmp->un.echo.id != getpid())
     {
         DEBUGF("someone else's packet %xd != %xd\n",
 			   icmp->un.echo.id, getpid()); /* DEBUG */
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
     }
 
 	check = icmp->checksum;
@@ -82,7 +82,7 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
     if (check != checksum((t_word *)msg, sizeof(t_packet)))
     {
         DEBUGF("checksum failed"); /* DEBUG */
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
     }
 
 	if (ft_memcmp(
@@ -90,7 +90,7 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 			"zboub", 6))
 	{
         DEBUGF("msg data corrupted"); /* DEBUG */
-        return (EXIT_FAILURE);
+        return (PING_ERROR);
 	}
 
 	since = (struct timeval *)((t_byte *)icmp + sizeof(struct icmphdr));
@@ -115,7 +115,12 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	if (g_env.opt.flags & FLAG_F)
 		putchar('\b');
 
-    return (EXIT_SUCCESS);
+	if ((g_env.opt.flags & FLAG_W)
+		&& USEC_TO_SEC(time_diff(&g_env.start_time, &now)) >= (t_dword)g_env.opt.deadline)
+		interupt_handler(42);
+
+
+    return (PING_SUCCESS);
 }
 
 int						recv_packet(void)
@@ -136,7 +141,7 @@ int						recv_packet(void)
 	if (ret	< 0)
 	{
 		/* perror("recv");			/\* DEBUG *\/ */
-		return (EXIT_FAILURE);
+		return (PING_ERROR);
 	}
 
 	return (validate_msg(iov_base, ret));
@@ -165,7 +170,7 @@ int						send_packet(void)
 	{
 		perror("send");									/* DEBUG */
 		printf("\nPacket Sending Failed! (%zd)\n", bwrote); /* DEBUG */
-		return (EXIT_FAILURE);
+		return (PING_ERROR);
 	}
 	if (bwrote < (ssize_t)sizeof(packet))
 	{
@@ -175,5 +180,5 @@ int						send_packet(void)
 	if (g_env.opt.flags & FLAG_F)
 		putchar('.');
 	g_env.stats.n_sent++;
-	return (EXIT_SUCCESS);
+	return (PING_SUCCESS);
 }

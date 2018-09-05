@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 00:45:53 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:33:33 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #include "ft_ping.h"
 
-static void		interupt_handler(int i)
+void		interupt_handler(int i)
 {
 	struct timeval	now;
 	double			avg = (double)g_env.stats.trip_time_sum
@@ -49,7 +49,10 @@ static void		interupt_handler(int i)
 			   )
 		);
 
-	exit(EXIT_SUCCESS);
+	if (!g_env.stats.n_received
+		|| (g_env.opt.deadline && g_env.stats.n_received < g_env.opt.n_packets))
+		exit(PING_FAILURE);
+	exit(PING_SUCCESS);
 }
 
 static void		alarm_handler(int i)
@@ -63,7 +66,7 @@ static void		alarm_handler(int i)
 
 	gettimeofday(&now, NULL);
 	if ((g_env.opt.flags & FLAG_W)
-		&& time_diff(&g_env.start_time, &now) / 1000 >= (t_dword)g_env.opt.deadline)
+		&& USEC_TO_SEC(time_diff(&g_env.start_time, &now)) >= (t_dword)g_env.opt.deadline)
 		interupt_handler(42);
 
 	send_packet();
@@ -76,7 +79,6 @@ void			sig_init(t_dword usec_interval)
 	if (!usec_interval)
 		usec_interval = SEC_TO_USEC(1); // default to 1 sec
 
-	signal(SIGINT, interupt_handler);
 	signal(SIGALRM, alarm_handler);
 	t.it_value.tv_sec = (t_dword)USEC_TO_SEC(usec_interval);
 	t.it_value.tv_usec = usec_interval - SEC_TO_USEC(t.it_value.tv_sec);
@@ -84,7 +86,8 @@ void			sig_init(t_dword usec_interval)
 	if (setitimer(ITIMER_REAL, &t, NULL) == -1)
 	{
 		perror("error calling setitimer()"); /* DEBUG */
-		exit(EXIT_FAILURE);
+		exit(PING_ERROR);
 	}
 	alarm_handler(SIGALRM); // don't wait for the first packet
+	signal(SIGINT, interupt_handler);
 }

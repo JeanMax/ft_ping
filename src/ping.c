@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:43:47 by mc                #+#    #+#             */
-/*   Updated: 2018/09/06 00:43:29 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:34:39 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,5 @@ int						ping(void)
 	while (42)
 		recv_packet();
 
-	return (EXIT_FAILURE);
+	return (PING_ERROR);
 }

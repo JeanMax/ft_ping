@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:07:28 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:25:54 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static t_bool			parse_flags(char *s, char *arg)
 	{
 		g_env.opt.flags |= FLAG_W;
 		g_env.opt.deadline = ft_atoi(arg);
-		if (g_env.opt.deadline < 0 || g_env.opt.deadline > INT_MAX / 2)
+		if (g_env.opt.deadline < 1 || g_env.opt.deadline > INT_MAX / 2)
 		{
 			fprintf(stderr, "bad wait time\n");
 			return (FALSE);
@@ -125,13 +125,6 @@ int						main(int ac, char **av)
 	g_env.stats.min_trip_time = 0xffff;
 
 	return (ping());
-    /* TODO: exit code */
-	/* If ping does not receive any reply packets at all it will exit with code 1.  */
-	/* If a packet count and deadline are both specified, and fewer than */
-	/* count packets are received by the time the deadline has arrived, it will */
-	/* also exit with code 1. On other error it exits with code 2. Otherwise */
-	/* it exits with code 0. This makes it possible to use the exit code to see */
-	/* if a host is alive or not. */
 
 	//TODO: remove DEBUG
 }

@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:07:34 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 01:34:40 by mc               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,5 @@ void			error(enum e_error e, char *msg)
 	else if (e == IPV6)
 		fprintf(stderr, "IPv6 protocol is not implemented.\n");
 
-	exit(EXIT_FAILURE);
+	exit(PING_ERROR);
 }
