@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:33:33 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 15:07:30 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ void		interupt_handler(int i)
 		   g_env.stats.min_trip_time,
 		   avg,
 		   g_env.stats.max_trip_time,
-		   sqrtl(
+		   ft_sqrtl(
 			   g_env.stats.trip_time_sum_squared / g_env.stats.n_received
-			   - (long double)avg * (long double)avg
+			   - (double)avg * (double)avg
 			   )
 		);
 

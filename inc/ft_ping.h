@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:32:35 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 15:10:26 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 # include <netinet/ip.h>
 # include <netinet/ip_icmp.h>
 # include <netdb.h>
-# include <math.h>
 
 /* If ping does not receive any reply packets at all it will exit with code 1.  */
 /* If a packet count and deadline are both specified, and fewer than */
@@ -79,6 +78,12 @@ typedef unsigned int	t_dword;
 # ifndef MAX
 #  define MAX(a, b) ((a) > (b) ? (a) : (b))
 # endif
+
+# ifndef ABS
+#  define ABS(x) ((x) < 0 ? -(x) : (x))
+# endif
+
+# define TOLERANCE		1e-4  // precision needed for square root computing
 
 /*
 ** time helper
@@ -221,8 +226,9 @@ void					interupt_handler(int i);
 */
 void					*ft_memcpy(void *dest, const void *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
-t_dword					time_diff(struct timeval *since, struct timeval *now);
 int						ft_atoi(char *str);
+double					ft_sqrtl(double x);
+t_dword					time_diff(struct timeval *since, struct timeval *now);
 
 /*
 **	-ping.c

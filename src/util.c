@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/27 14:12:13 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 14:59:00 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 15:10:57 by mcanal           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,4 +124,20 @@ t_dword			time_diff(struct timeval *since, struct timeval *now)
 
 	return (now->tv_sec - since->tv_sec - 1) * (t_dword)1e6
 		+ (now->tv_usec - since->tv_usec + (t_dword)1e6);
+}
+
+
+/*
+** square root (babylon)
+*/
+double					ft_sqrtl(double x)
+{
+	double n = x / 2;
+
+	do
+	{
+		n = (n + x / n) / 2;
+	} while (ABS(n * n - x) > TOLERANCE);
+
+	return n;
 }
