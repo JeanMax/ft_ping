@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:30:10 by mc                #+#    #+#             */
-/*   Updated: 2018/09/06 01:35:09 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 16:47:17 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,20 +60,23 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	}
     if (icmp->type != ICMP_ECHOREPLY)
     {
-        DEBUGF("nonecho type %hhu recvd\n", icmp->type); /* DEBUG */
+		if (g_env.opt.flags & FLAG_V)
+			fprintf(stderr, "nonecho type %hhu recvd\n", icmp->type);
         return (PING_ERROR);
     }
 
 	if (msg_len != sizeof(t_packet))
 	{
-        DEBUGF("incomplete packet"); /* DEBUG */
+		if (g_env.opt.flags & FLAG_V)
+			fprintf(stderr, "incomplete packet\n");
         return (PING_ERROR);
 	}
 
     if (icmp->un.echo.id != getpid())
     {
-        DEBUGF("someone else's packet %xd != %xd\n",
-			   icmp->un.echo.id, getpid()); /* DEBUG */
+		if (g_env.opt.flags & FLAG_V)
+			fprintf(stderr, "someone else's packet %xd != %xd\n",
+					icmp->un.echo.id, getpid());
         return (PING_ERROR);
     }
 
@@ -81,7 +84,8 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	icmp->checksum = 0;
     if (check != checksum((t_word *)msg, sizeof(t_packet)))
     {
-        DEBUGF("checksum failed"); /* DEBUG */
+		if (g_env.opt.flags & FLAG_V)
+			fprintf(stderr, "checksum failed\n");
         return (PING_ERROR);
     }
 
@@ -89,7 +93,8 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 			((t_byte *)icmp + sizeof(struct icmphdr) + sizeof(struct timeval)),
 			"zboub", 6))
 	{
-        DEBUGF("msg data corrupted"); /* DEBUG */
+		if (g_env.opt.flags & FLAG_V)
+			fprintf(stderr, "msg data corrupted\n");
         return (PING_ERROR);
 	}
 
@@ -113,7 +118,7 @@ static int				validate_msg(t_byte *msg, ssize_t msg_len)
 	}
 
 	if (g_env.opt.flags & FLAG_F)
-		putchar('\b');
+		write(1, "\b \b", 3);
 
 	if ((g_env.opt.flags & FLAG_W)
 		&& USEC_TO_SEC(time_diff(&g_env.start_time, &now)) >= (t_dword)g_env.opt.deadline)
@@ -139,10 +144,7 @@ int						recv_packet(void)
 
 	ret = recvmsg(g_env.sock, &msg, MSG_DONTWAIT);
 	if (ret	< 0)
-	{
-		/* perror("recv");			/\* DEBUG *\/ */
-		return (PING_ERROR);
-	}
+		return (PING_ERROR);  // nothing to recv
 
 	return (validate_msg(iov_base, ret));
 }
@@ -168,17 +170,18 @@ int						send_packet(void)
 					g_env.addr_info.ai_addrlen);
 	if (bwrote < 0)
 	{
-		perror("send");									/* DEBUG */
-		printf("\nPacket Sending Failed! (%zd)\n", bwrote); /* DEBUG */
+		if (!g_env.stats.n_sent)
+			error(SEND, "");
+		if (!(g_env.opt.flags & FLAG_Q))
+			fprintf(stderr, "./ft_ping: sendmsg: Network is unreachable\n");
 		return (PING_ERROR);
 	}
-	if (bwrote < (ssize_t)sizeof(packet))
-	{
-		printf("Wrote %zd/%zu bytes\n", bwrote, sizeof(packet)); /* DEBUG */
-	}
+	if (bwrote < (ssize_t)sizeof(packet) && (g_env.opt.flags & FLAG_V))
+		fprintf(stderr, "Wrote %zd/%zu bytes\n", bwrote, sizeof(packet));
 
 	if (g_env.opt.flags & FLAG_F)
-		putchar('.');
+		write(1, ".", 1);
+
 	g_env.stats.n_sent++;
 	return (PING_SUCCESS);
 }

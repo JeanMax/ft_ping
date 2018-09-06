@@ -6,7 +6,7 @@
 /*   By: mc <mc.maxcanal@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/29 12:27:55 by mc                #+#    #+#             */
-/*   Updated: 2018/09/04 15:21:07 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 16:28:53 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int						get_sock(void)
 	hints.ai_protocol = IPPROTO_ICMP;
 
 	if (getaddrinfo(g_env.opt.host, NULL, &hints, &result))
-		error(ADDRINFO, NULL);
+		error(ADDRINFO, g_env.opt.host);
 
 	sock = socks_loop(result);
 

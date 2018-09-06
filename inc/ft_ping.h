@@ -6,7 +6,7 @@
 /*   By: mcanal <mcanal@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/29 13:23:15 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 15:10:26 by mcanal           ###   ########.fr       */
+/*   Updated: 2018/09/06 16:46:21 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,9 @@ enum	e_error
 	INET_NTOP,
 	ADDRINFO,
 	SOCKET,
-	IPV6
+	IPV6,
+	TIMER,
+	SEND
 };
 
 /*
@@ -116,19 +118,6 @@ enum	e_error
 # define CLR_CYAN "\033[36;01m"
 # define CLR_WHITE "\033[37;01m"
 # define CLR_RESET "\033[0m"
-
-/*
-** optional debug statements
-*/
-# define ANNOYING_DEBUG
-# ifdef ANNOYING_DEBUG
-#  include <stdio.h>
-#  define DEBUG_HEADER CLR_MAGENTA "[DEBUG] " CLR_RESET
-#  define DEBUGF(str, ...) fprintf(stderr, DEBUG_HEADER "<" str ">" CLR_RESET "\n", ##__VA_ARGS__)
-# else
-#  define DEBUGF(str, ...) do {} while (0)
-# endif //ANNOYING_DEBUG
-
 
 /*
 ** packet struct

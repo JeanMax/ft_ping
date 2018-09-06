@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 15:15:00 by vm               ###   ########.fr       */
+/*   Updated: 2018/09/06 15:56:13 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,7 @@ void			sig_init(t_dword usec_interval)
 	t.it_value.tv_usec = usec_interval - SEC_TO_USEC(t.it_value.tv_sec);
 	t.it_interval = t.it_value;
 	if (setitimer(ITIMER_REAL, &t, NULL) == -1)
-	{
-		perror("error calling setitimer()"); /* DEBUG */
-		exit(PING_ERROR);
-	}
+		error(TIMER, NULL);
 	alarm_handler(SIGALRM); // don't wait for the first packet
 	signal(SIGINT, interupt_handler);
 }

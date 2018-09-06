@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 15:13:35 by vm               ###   ########.fr       */
+/*   Updated: 2018/09/06 16:26:59 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,24 @@ static t_bool			parse_flags(char *s, char *arg)
 	if (*s == 'h' || *(s + 1))
 		return (FALSE);
 
-	if (*s == 'v') //TODO
+	if (*s == 'v')
 	{
+		if ((g_env.opt.flags & FLAG_Q))
+		{
+			fprintf(stderr, "can't be verbose and quiet at the same time.\n");
+			return (FALSE);
+		}
 		g_env.opt.flags |= FLAG_V;
 		return (TRUE);
 	}
 
 	if (*s == 'q')
 	{
+		if ((g_env.opt.flags & FLAG_V))
+		{
+			fprintf(stderr, "can't be verbose and quiet at the same time.\n");
+			return (FALSE);
+		}
 		g_env.opt.flags |= FLAG_Q;
 		return (TRUE);
 	}
@@ -79,8 +89,13 @@ static t_bool			parse_flags(char *s, char *arg)
 
 	if (*s == 'f')
 	{
+		if ((g_env.opt.flags & FLAG_V))
+		{
+			fprintf(stderr, "can't be verbose and quiet at the same time.\n");
+			return (FALSE);
+		}
 		if (!(g_env.opt.flags & FLAG_I))
-			g_env.opt.interval = 15;
+			g_env.opt.interval = 2;
 		g_env.opt.flags |= (FLAG_F | FLAG_Q);
 		return (TRUE);
 	}
@@ -125,7 +140,4 @@ int						main(int ac, char **av)
 	g_env.stats.min_trip_time = 0xffff;
 
 	return (ping());
-
-	//TODO: remove DEBUG
-	//TODO: handle errors messages
 }

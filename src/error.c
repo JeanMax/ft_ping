@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/09 19:39:48 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:34:40 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 16:46:09 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,15 @@ void			error(enum e_error e, char *msg)
 	else if (e == INET_NTOP)
 		fprintf(stderr, "inet_ntop failed.\n");
 	else if (e == ADDRINFO)
-		fprintf(stderr, "getaddrinfo failed.\n");
+		fprintf(stderr, "./ft_ping: %s: Name or service not known.\n", msg);
 	else if (e == SOCKET)
 		fprintf(stderr, "socket failed.\n");
 	else if (e == IPV6)
 		fprintf(stderr, "IPv6 protocol is not implemented.\n");
+	else if (e == TIMER)
+		fprintf(stderr, "setitimer failed.\n");
+	else if (e == SEND)
+		fprintf(stderr, "connect: Network is unreachable.\n");
 
 	exit(PING_ERROR);
 }
