@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/19 15:07:35 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 01:25:54 by mc               ###   ########.fr       */
+/*   Updated: 2018/09/06 15:13:35 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,4 +127,5 @@ int						main(int ac, char **av)
 	return (ping());
 
 	//TODO: remove DEBUG
+	//TODO: handle errors messages
 }

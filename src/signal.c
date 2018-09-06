@@ -6,7 +6,7 @@
 /*   By: mcanal <zboub@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/27 04:34:21 by mcanal            #+#    #+#             */
-/*   Updated: 2018/09/06 15:07:30 by mcanal           ###   ########.fr       */
+/*   Updated: 2018/09/06 15:15:00 by vm               ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void		interupt_handler(int i)
 		);
 
 	if (g_env.stats.n_received)
-		printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3Lf ms\n",
+		printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
 		   g_env.stats.min_trip_time,
 		   avg,
 		   g_env.stats.max_trip_time,
